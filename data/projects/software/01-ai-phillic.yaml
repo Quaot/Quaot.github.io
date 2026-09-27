@@ -26,9 +26,14 @@ links:
 - label: IDEA-X announcement
   url: https://www.sd35.bc.ca/idea-x-challenges-students-to-explore-ai-solutions.22609
 cover:
-  src: media/ai-phillic/lesson-001-b2.jpg
+  src: media/ai-phillic/award-cover.jpg
   fit: cover
 media:
+- type: image
+  src: media/ai-phillic/award.jpg
+  portrait: true
+  alt: The glass IDEA-X Outstanding Solution award from Langley Schools, held in one hand
+  caption: The Outstanding Solution award, presented by Langley Schools at IDEA-X 2026.
 - type: image
   src: media/ai-phillic/lesson-001-b2.jpg
   alt: Illustration of a duckling on a log reading a tablet, from lesson one

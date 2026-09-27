@@ -65,9 +65,10 @@
   }
 
   // ---- one project: text first, then every picture stacked one after another ----
-  function frameFor(m) {
+  function frameFor(m, first) {
     if (is3D(m)) return h('div', { class: 'plate model' }, viewer(m));
-    const img = h('img', { src: m.src, alt: m.alt || '', loading: 'lazy' });
+    // The first picture shows immediately; a lazy portrait image has no size yet and would never load.
+    const img = h('img', { src: m.src, alt: m.alt || '', loading: first || m.portrait ? 'eager' : 'lazy' });
     // Small images (CAD previews, icons) sit on a plate instead of being blown up.
     img.addEventListener('load', () => {
       if (img.naturalWidth && img.naturalWidth < 900 && !m.src.endsWith('.svg')) {
@@ -75,7 +76,7 @@
         img.parentElement.classList.add('small');
       }
     });
-    return h('div', { class: 'plate' + (m.dark ? ' dark' : '') + (m.src.endsWith('.svg') && !m.wide ? ' drawing' : '') }, img);
+    return h('div', { class: 'plate' + (m.dark ? ' dark' : '') + (m.portrait ? ' portrait' : '') + (m.src.endsWith('.svg') && !m.wide ? ' drawing' : '') }, img);
   }
 
   function projectView(d, id) {
@@ -99,7 +100,7 @@
           p.stack && p.stack.length ? [h('dt', { class: 'muted' }, 'Tools'), h('dd', {}, p.stack.join(', '))] : null,
           p.links && p.links.length ? [h('dt', { class: 'muted' }, 'Links'), h('dd', { class: 'links' }, linkList(p.links))] : null)),
       media.length ? h('div', { class: 'stack' }, media.map((m, k) =>
-        h('figure', { class: 'stack-item' }, frameFor(m),
+        h('figure', { class: 'stack-item' }, frameFor(m, k === 0),
           h('figcaption', {},
             h('span', { class: 'num muted' }, String(k + 1).padStart(2, '0')),
             h('span', {}, m.caption || ''))))) : null,
