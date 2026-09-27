@@ -8,7 +8,7 @@ summary: >-
   resistors. I drew it in KiCad and checked it in SPICE. The board further
   down is a concept layout to show it fits on 33 by 20 mm; it hasn't been made.
 points:
-  - Every node sees 2R to ground, so each bit contributes half as much voltage as the bit above it.
+  - Looking back toward RT, every node sees 2R, so each bit contributes half as much voltage as the bit above it.
   - Used superposition to show that the output is the input voltage times the binary value over 16.
 stack: [KiCad, SPICE]
 links:
@@ -23,11 +23,12 @@ media:
     src: media/r2r/schematic-clean.svg
     wide: true
     alt: Schematic of the 4-bit R-2R ladder, four 20k legs from B0 to B3 into a chain of 10k resistors, RT to ground, output at VOUT
-    caption: The ladder, redrawn from my KiCad schematic with the same parts and nets. Every node looks down at 2R, which is what makes each bit worth half the one above it.
+    caption: The ladder, redrawn from my KiCad schematic with the same parts and nets. Looking back toward RT, every node sees 2R, which is what makes each bit worth half the one above it.
   - type: image
-    src: media/r2r/process/staircase.png
-    alt: Staircase chart of output voltage for all 16 input codes
-    caption: All 16 codes. Each step is 0.206 V, and code 15 stops at 3.09 V, one step short of 3.3 V.
+    src: media/r2r/process/steps.svg
+    wide: true
+    alt: Step line of output voltage for all 16 input codes, from 0 V up to 3.09 V
+    caption: The top code stops one step short of 3.3 V, because the ladder divides by 16, not 15.
   - type: image
     src: media/r2r/process/layers.png
     dark: true

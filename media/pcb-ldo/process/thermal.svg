@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" width="1200" height="560"><style>
+  .bg { fill: #f2f2f2; } .ink { fill: #111; } .muted { fill: #8a8a8a; }
+  .line { stroke: #111; } .hair { stroke: #d6d6d6; } .track { fill: #dcdcdc; }
+  .accent { fill: #d4892f; } .accent-line { stroke: #d4892f; }
+  text { font-family: 'Inter Tight','Helvetica Neue',Helvetica,Arial,sans-serif; }
+  @media (prefers-color-scheme: dark) {
+    .bg { fill: #1a1a1a; } .ink { fill: #f2f2f2; } .muted { fill: #7c7c7c; }
+    .line { stroke: #f2f2f2; } .hair { stroke: #2e2e2e; } .track { fill: #2f2f2f; }
+  }
+</style><rect class="bg" width="1200" height="560"/><text x="80" y="90" class="muted" font-size="22" font-weight="400" text-anchor="start">Junction temperature, 500 mA on a 45 °C day</text><text x="76" y="196" class="ink" font-size="104" font-weight="600" text-anchor="start">116 °C</text><text x="80" y="244" class="muted" font-size="20" font-weight="400" text-anchor="start">0.85 W × 84 °C/W, with 194 mm² of copper on the tab. 96 °C in a 25 °C room.</text><rect x="80" y="353" width="1040" height="14" rx="7" class="track"/><rect x="80" y="353" width="950.56" height="14" rx="7" class="ink"/><line x1="1120" y1="326" x2="1120" y2="394" class="accent-line" stroke-width="3"/><text x="1120" y="426" class="ink" font-size="20" font-weight="500" text-anchor="end">125 °C limit</text><text x="1104" y="334" class="ink" font-size="20" font-weight="500" text-anchor="end">9 °C to spare</text><text x="80" y="426" class="muted" font-size="20" font-weight="400" text-anchor="start">25 °C</text></svg>
