@@ -2,7 +2,7 @@ title: IronLog
 subtitle: Offline gym tracker for iPhone and the web
 role: Personal project
 when: 2026
-status: Live
+status: Built (web version being fixed)
 summary: >-
   A gym tracker built for one thumb and no signal. Everything stays on the
   phone: no account, nothing uploaded, nothing to pay for. It installs as a
@@ -13,8 +13,6 @@ points:
   - Interface rules, such as how screens slide and how copy is written, are enforced by automated tests against the rendered app.
 stack: [TypeScript, React, PWA, iOS, Playwright]
 links:
-  - label: Open the app
-    url: https://quaot.github.io/ironlog/
   - label: Repository
     url: https://github.com/Quaot/ironlog
 cover:

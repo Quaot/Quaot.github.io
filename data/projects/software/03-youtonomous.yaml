@@ -9,7 +9,7 @@ summary: >-
   starts, and opens it there every time.
 points:
   - Turns YouTube chapters into bookmarks, and lets you add your own with a label.
-  - Keyboard shortcuts for seeking, jumping between bookmarks and setting the start point.
+  - Keyboard shortcuts to seek, jump between bookmarks and set the start point.
   - Uses yt-dlp to download and libVLC to play, with a CMake build and tests.
 stack: [C++, CMake, libVLC, yt-dlp]
 links:
