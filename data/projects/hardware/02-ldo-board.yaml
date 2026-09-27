@@ -17,8 +17,8 @@ links:
 media:
   - type: glb
     src: media/pcb-ldo/board.glb
-    alt: Interactive 3D model of the bare regulator board
-    caption: Bare board, built from my fabrication Gerbers and drill file. Drag to rotate.
+    alt: Interactive 3D model of the assembled regulator board
+    caption: 3D model from my Gerbers and Altium STEP export. Drag to rotate.
   - type: image
     src: media/pcb-ldo/render.png
     alt: 3D render of the regulator board

@@ -3,10 +3,13 @@
 One-off tool, not part of the site build. The output GLB is committed under media/.
 
     python scripts/gerbers_to_glb.py <gerber dir> <out.glb> [--prefix PCB1]
+        [--outline X0,Y0,X1,Y1] [--parts board.step]
 
 Reads <prefix>.GTL/GBL (copper), .GTS/GBS (solder mask), .GTO (top silk) and
 <prefix>.TXT (Excellon drill, metric). The board outline is not in the Gerbers,
-so it is taken as the bottom copper pour's extent plus the pour clearance.
+so it is taken as the bottom copper pour's extent plus the pour clearance,
+unless --outline gives it. --parts adds the components from the board's STEP
+export (converted with cascadio), dropping the STEP's untextured board body.
 Needs pygerber 2.4, shapely >= 2.1, trimesh, numpy and Pillow.
 """
 import argparse
@@ -126,17 +129,43 @@ def solid(color):
         baseColorFactor=list(color) + [255], metallicFactor=0.0, roughnessFactor=0.8, doubleSided=True)
 
 
+def step_parts(step, bounds, centre):
+    """Component meshes from a STEP export, moved into the board's frame."""
+    import tempfile
+    import cascadio
+    with tempfile.TemporaryDirectory() as tmp:
+        glb = str(Path(tmp) / 'parts.glb')
+        cascadio.step_to_glb(str(step), glb, tol_linear=0.02, tol_angular=0.3)
+        meshes = trimesh.load(glb).dump()
+    x0, y0, x1, y1 = bounds
+    cx, cy = centre
+    # STEP is in metres, Z up, board top at z = 0. Ours: mm, Y up, centred.
+    m = np.array([[1000, 0, 0, -cx], [0, 0, 1000, THICKNESS / 2], [0, -1000, 0, cy], [0, 0, 0, 1]], float)
+    for mesh in meshes:
+        lo, hi = mesh.bounds * 1000
+        is_board = (abs(lo[0] - x0) < 0.05 and abs(hi[0] - x1) < 0.05 and abs(lo[1] - y0) < 0.05
+                    and abs(hi[1] - y1) < 0.05 and abs(hi[2] - lo[2] - THICKNESS) < 0.05)
+        if not is_board:
+            mesh.apply_transform(m)
+            yield mesh.metadata.get('name', 'part'), mesh
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('gerbers', type=Path)
     ap.add_argument('out', type=Path)
     ap.add_argument('--prefix', default='PCB1')
+    ap.add_argument('--outline', help='board extent in Gerber mm: X0,Y0,X1,Y1')
+    ap.add_argument('--parts', type=Path, help='STEP export of the assembled board')
     args = ap.parse_args()
     g = lambda ext: str(args.gerbers / f'{args.prefix}.{ext}')
 
-    pour = GerberFile.from_file(g('GBL')).parse().get_info()
-    bounds = (float(pour.min_x_mm) - POUR_CLEARANCE, float(pour.min_y_mm) - POUR_CLEARANCE,
-              float(pour.max_x_mm) + POUR_CLEARANCE, float(pour.max_y_mm) + POUR_CLEARANCE)
+    if args.outline:
+        bounds = tuple(float(v) for v in args.outline.split(','))
+    else:
+        pour = GerberFile.from_file(g('GBL')).parse().get_info()
+        bounds = (float(pour.min_x_mm) - POUR_CLEARANCE, float(pour.min_y_mm) - POUR_CLEARANCE,
+                  float(pour.max_x_mm) + POUR_CLEARANCE, float(pour.max_y_mm) + POUR_CLEARANCE)
     x0, y0, x1, y1 = bounds
     print(f'board {x1 - x0:.2f} x {y1 - y0:.2f} mm')
 
@@ -169,6 +198,10 @@ def main():
     barrels = trimesh.util.concatenate([wall(r, outward=False) for r in board.interiors])
     barrels.visual = trimesh.visual.TextureVisuals(material=solid(BARREL))
     scene.add_geometry(barrels, geom_name='barrels')
+
+    if args.parts:
+        for name, mesh in step_parts(args.parts, (x0, y0, x1, y1), (cx, cy)):
+            scene.add_geometry(mesh, geom_name=name)
 
     args.out.write_bytes(scene.export(file_type='glb'))
     print(f'wrote {args.out} ({args.out.stat().st_size // 1024} KB)')

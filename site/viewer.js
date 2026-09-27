@@ -64,6 +64,7 @@
         }
         scene.add(model);
         const sphere = new THREE.Box3().setFromObject(model).getBoundingSphere(new THREE.Sphere());
+        model.position.sub(sphere.center);
         frame(sphere.radius * 0.9);   // flat boards look lost in a full bounding-sphere frame
       }, undefined, failed);
     } else {
