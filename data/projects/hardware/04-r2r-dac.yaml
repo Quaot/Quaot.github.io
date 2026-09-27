@@ -14,6 +14,10 @@ links:
   - label: Repository
     url: https://github.com/Quaot/R-2R_DAC
 media:
+  - type: glb
+    src: media/r2r/board.glb
+    alt: Interactive 3D model of a two-layer board for the R-2R ladder, with pads for eight 0805 resistors and two pin headers
+    caption: Concept two-layer layout of the schematic, not fabricated. Drag to rotate.
   - type: image
     src: media/r2r/schematic.svg
     alt: Schematic of the R-2R resistor ladder
