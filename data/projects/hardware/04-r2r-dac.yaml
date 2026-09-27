@@ -5,7 +5,7 @@ when: September 2026
 status: Designed
 summary: >-
   A 4-bit digital-to-analog converter made only of resistors, drawn in KiCad. It
-  turns a 4-bit input into one of 16 output voltages between 0 and 3.3 V.
+  turns a 4-bit input into one of 16 output voltages, from 0 to 3.09 V in 0.206 V steps.
 points:
   - Every node sees 2R to ground, so each bit contributes half as much voltage as the bit above it.
   - Used superposition to show that the output is the input voltage times the binary value over 16.

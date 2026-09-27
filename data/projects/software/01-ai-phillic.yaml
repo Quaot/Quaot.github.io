@@ -1,15 +1,15 @@
 title: AI-Phillic
 subtitle: Teaching students to check what they read online
-role: Builder
+role: Team of four
 when: 2026
-status: Winner, $10,000 IDEA-X scholarship
+status: 1st of 8 finalists, $10,000 IDEA-X award
 summary: >-
-  A mobile app that teaches source-checking through short lessons, backed by a
-  service that actually checks a claim against real sources.
+  Our winning IDEA-X 2026 entry: a mobile app that teaches source-checking
+  through short lessons, backed by a service that checks a claim against real sources.
 points:
-  - The app runs lessons as story beats where students tap the claims they think were invented, with streaks, experience points and badges.
-  - The service splits a claim into its separate assertions, searches the open web, community sites and scholarly sources, and judges each source as supporting, contradicting or neutral.
-  - Sources it can't read are returned and marked for manual checking instead of being dropped. Tests cover claim splitting, input handling and scoring.
+  - The app runs lessons as story beats where students tap the claims they think were invented, earning streaks and badges.
+  - The service splits a claim into its separate assertions, searches the open web, community sites and scholarly sources, and judges each source for or against the claim, with its reason.
+  - Sources it can't read are returned and marked for manual checking instead of being dropped.
 stack: [TypeScript, Expo, React Native, Express, Zod, Supabase, Vitest]
 links:
   - label: Repository
