@@ -21,5 +21,9 @@ media:
     caption: 3D render from Altium.
   - type: image
     src: media/pcb-ldo/schematic.png
-    alt: Schematic of the LM1117 regulator circuit
-    caption: Schematic.
+    alt: Altium schematic of the LM1117 regulator circuit, with input and output connectors, divider resistors, capacitors and a power LED
+    caption: Schematic, exported from Altium.
+  - type: image
+    src: media/pcb-ldo/layout.png
+    alt: PCB layout of the regulator board, labelled JUSTIN LDO V1
+    caption: PCB layout.
