@@ -46,8 +46,8 @@ def main():
                     errors.append(f"{where}: missing '{key}'")
             for m in p.get("media") or []:
                 check_media(m.get("src"), where)
-                if m.get("type") not in ("image", "stl"):
-                    errors.append(f"{where}: media type must be image or stl, got {m.get('type')!r}")
+                if m.get("type") not in ("image", "stl", "glb"):
+                    errors.append(f"{where}: media type must be image, stl or glb, got {m.get('type')!r}")
             p["id"] = path.stem.split("-", 1)[-1]
             projects.append(p)
         categories.append({"id": cat["id"], "title": cat.get("title", cat["id"]), "projects": projects})

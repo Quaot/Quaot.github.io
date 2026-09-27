@@ -18,16 +18,18 @@
     }, l.label));
   }
 
+  const is3D = (m) => m.type === 'stl' || m.type === 'glb';
+
   function mediaBlock(media) {
     const stage = h('div', { class: 'stage frame' });
     const caption = h('figcaption', { class: 'label' });
     function show(i) {
       const m = media[i];
       stage.replaceChildren();
-      if (m.type === 'stl') {
+      if (is3D(m)) {
         const v = h('div', { class: 'viewer' });
         stage.append(v);
-        window.STLViewer.watch(v, m.src);
+        window.STLViewer.watch(v, m.src, m.type);
       } else {
         stage.append(h('img', { src: m.src, alt: m.alt || '', loading: 'lazy' }));
       }
@@ -35,8 +37,8 @@
       $$('button', thumbs).forEach((b, j) => b.setAttribute('aria-pressed', String(j === i)));
     }
     const thumbs = h('div', { class: 'thumbs' }, media.length < 2 ? [] : media.map((m, i) => {
-      const b = h('button', { type: 'button', 'aria-label': `Show ${m.type === 'stl' ? '3D model' : 'image'} ${i + 1}` },
-        m.type === 'stl' ? '3D' : h('img', { src: m.src, alt: '' }));
+      const b = h('button', { type: 'button', 'aria-label': `Show ${is3D(m) ? '3D model' : 'image'} ${i + 1}` },
+        is3D(m) ? '3D' : h('img', { src: m.src, alt: '' }));
       b.addEventListener('click', () => show(i));
       return b;
     }));
