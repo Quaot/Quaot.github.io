@@ -8,7 +8,6 @@
   function mount(el, src, type) {
     if (el._viewer) return;
     el._viewer = true;
-    el.style.position = el.style.position || 'relative';
     const loading = document.createElement('div');
     loading.className = 'loading label';
     loading.textContent = 'Loading model';
@@ -93,8 +92,14 @@
     let visible = true;
     new IntersectionObserver((e) => { visible = e[0].isIntersecting; }).observe(el);
     (function loop() {
+      if (!el.isConnected) {   // its page was replaced: free the GL context
+        controls.dispose();
+        renderer.dispose();
+        renderer.forceContextLoss();
+        return;
+      }
       requestAnimationFrame(loop);
-      if (!visible || !el.isConnected) return;
+      if (!visible) return;
       controls.update();
       renderer.render(scene, camera);
     })();
