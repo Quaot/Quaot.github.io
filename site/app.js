@@ -28,16 +28,27 @@
   }
 
   // ---- project grid -------------------------------------------------------------
-  function tile(p, category) {
+  function tile(p, label) {
+    const c = p.cover || {};
     const m = (p.media || [])[0];
     let cover;
-    if (!m) cover = h('div', { class: 'cover type' }, h('span', {}, p.title));
-    else if (is3D(m)) cover = h('div', { class: 'cover' }, viewer(m, 'still'));
-    else cover = h('div', { class: 'cover' }, h('img', { src: m.src, alt: m.alt || '', loading: 'lazy' }));
+    if (c.poster) {
+      cover = h('div', { class: 'cover poster', style: `background:${c.poster.bg};color:${c.poster.fg}` },
+        c.poster.logo ? h('img', { class: 'logo', src: c.poster.logo, alt: '' }) : null,
+        h('span', { class: 'poster-title' }, p.title));
+    } else if (c.src) {
+      cover = h('div', { class: 'cover' + (c.fit === 'cover' ? ' bleed' : '') }, h('img', { src: c.src, alt: '', loading: 'lazy' }));
+    } else if (m && is3D(m)) {
+      cover = h('div', { class: 'cover' }, viewer(m, 'still'));
+    } else if (m) {
+      cover = h('div', { class: 'cover' + (m.dark ? ' dark' : '') }, h('img', { src: m.src, alt: m.alt || '', loading: 'lazy' }));
+    } else {
+      cover = h('div', { class: 'cover poster' }, h('span', { class: 'poster-title' }, p.title));
+    }
     return h('a', { class: 'tile', href: `#/p/${p.id}` }, cover,
       h('div', { class: 'tile-text' },
         h('span', { class: 'tile-title' }, p.title),
-        h('span', { class: 'muted' }, category)));
+        h('span', { class: 'muted' }, label)));
   }
 
   function gridView(d) {
@@ -45,29 +56,26 @@
       h('section', { class: 'lede' },
         h('p', { class: 'big' }, d.tagline || ''),
         d.intro ? h('p', { class: 'big muted' }, d.intro) : null),
+      d.hero_layers ? h('figure', { class: 'hero' },
+        h('div', { class: 'hero-stage' }, viewer({ src: d.hero_layers.src, type: 'layers' })),
+        h('figcaption', { class: 'muted small' }, d.hero_layers.caption || '')) : null,
       d.categories.map((c) => h('section', { class: 'group', id: c.id },
-        h('h2', { class: 'group-title muted' }, c.title),
+        h('h2', { class: 'group-title' }, c.title),
         h('div', { class: 'grid' }, c.projects.map((p) => tile(p, p.subtitle || c.title))))));
   }
 
-  // ---- one project --------------------------------------------------------------
-  function mediaBlock(media) {
-    const stage = h('div', { class: 'stage' });
-    const caption = h('figcaption', { class: 'muted small' });
-    function show(i) {
-      const m = media[i];
-      stage.replaceChildren(is3D(m) ? viewer(m) : h('img', { src: m.src, alt: m.alt || '' }));
-      caption.textContent = m.caption || '';
-      $$('button', thumbs).forEach((b, j) => b.setAttribute('aria-pressed', String(j === i)));
-    }
-    const thumbs = h('div', { class: 'thumbs' }, media.length < 2 ? [] : media.map((m, i) => {
-      const b = h('button', { type: 'button', 'aria-label': `Show ${is3D(m) ? '3D model' : 'image'} ${i + 1}` },
-        is3D(m) ? '3D' : h('img', { src: m.src, alt: '' }));
-      b.addEventListener('click', () => show(i));
-      return b;
-    }));
-    show(0);
-    return h('figure', { class: 'media' }, stage, caption, thumbs);
+  // ---- one project: text first, then every picture stacked one after another ----
+  function frameFor(m) {
+    if (is3D(m)) return h('div', { class: 'plate model' }, viewer(m));
+    const img = h('img', { src: m.src, alt: m.alt || '', loading: 'lazy' });
+    // Small images (CAD previews, icons) sit on a plate instead of being blown up.
+    img.addEventListener('load', () => {
+      if (img.naturalWidth && img.naturalWidth < 900 && !m.src.endsWith('.svg')) {
+        img.style.maxWidth = `${Math.round(img.naturalWidth * 1.6)}px`;
+        img.parentElement.classList.add('small');
+      }
+    });
+    return h('div', { class: 'plate' + (m.dark ? ' dark' : '') + (m.src.endsWith('.svg') ? ' drawing' : '') }, img);
   }
 
   function projectView(d, id) {
@@ -76,21 +84,27 @@
     if (i < 0) return null;
     const { p, c } = all[i];
     const next = all[(i + 1) % all.length].p;
-    const facts = [['Category', c.title], ['When', p.when], ['Role', p.role], ['Status', p.status]]
-      .filter(([, v]) => v);
+    const facts = [['When', p.when], ['Role', p.role], ['Status', p.status]].filter(([, v]) => v);
+    const media = p.media || [];
     return h('article', { class: 'page project' },
       h('header', { class: 'project-head' },
+        h('p', { class: 'muted' }, c.title),
         h('h1', {}, p.title),
         p.subtitle ? h('p', { class: 'big muted' }, p.subtitle) : null),
-      p.media && p.media.length ? mediaBlock(p.media) : null,
       h('div', { class: 'project-body' },
-        h('div', { class: 'prose' },
-          h('p', { class: 'summary' }, p.summary),
-          p.points && p.points.length ? h('ul', {}, p.points.map((t) => h('li', {}, t))) : null),
+        h('div', { class: 'prose' }, h('p', { class: 'summary' }, p.summary)),
         h('dl', { class: 'facts' },
           facts.map(([k, v]) => [h('dt', { class: 'muted' }, k), h('dd', {}, v)]),
           p.stack && p.stack.length ? [h('dt', { class: 'muted' }, 'Tools'), h('dd', {}, p.stack.join(', '))] : null,
           p.links && p.links.length ? [h('dt', { class: 'muted' }, 'Links'), h('dd', { class: 'links' }, linkList(p.links))] : null)),
+      media.length ? h('div', { class: 'stack' }, media.map((m, k) =>
+        h('figure', { class: 'stack-item' }, frameFor(m),
+          h('figcaption', {},
+            h('span', { class: 'num muted' }, String(k + 1).padStart(2, '0')),
+            h('span', {}, m.caption || ''))))) : null,
+      p.points && p.points.length ? h('section', { class: 'notes' },
+        h('h2', { class: 'sub' }, 'Notes'),
+        h('ul', {}, p.points.map((t) => h('li', {}, t)))) : null,
       h('nav', { class: 'next' },
         h('a', { href: '#/' }, 'All projects'),
         h('a', { href: `#/p/${next.id}` }, h('span', { class: 'muted' }, 'Next '), next.title)));
@@ -100,17 +114,14 @@
   function profileView(d) {
     const hm = d.hero_model;
     return h('div', { class: 'page profile' },
-      hm && hm.src ? h('figure', { class: 'media' },
-        h('div', { class: 'stage' }, viewer({ src: hm.src, type: 'stl' })),
-        h('figcaption', { class: 'muted small' }, hm.caption || '')) : null,
+      h('header', { class: 'project-head' }, h('h1', {}, 'A bit more about me')),
       h('div', { class: 'project-body' },
-        h('div', { class: 'prose' },
-          h('h2', { class: 'sub' }, 'A bit more about me'),
-          h('p', {}, d.about || ''),
-          d.intro ? h('p', {}, d.intro) : null),
+        h('div', { class: 'prose' }, (d.about || '').split(/\n\s*\n/).map((t) => h('p', {}, t))),
         h('dl', { class: 'facts' },
-          h('dt', { class: 'muted' }, 'Now'), h('dd', {}, d.tagline || ''),
-          h('dt', { class: 'muted' }, 'Elsewhere'), h('dd', { class: 'links' }, linkList(d.links)))));
+          h('dt', { class: 'muted' }, 'Elsewhere'), h('dd', { class: 'links' }, linkList(d.links)))),
+      hm && hm.src ? h('div', { class: 'stack' }, h('figure', { class: 'stack-item' },
+        h('div', { class: 'plate model' }, viewer({ src: hm.src, type: 'stl' })),
+        h('figcaption', {}, h('span', {}, hm.caption || '')))) : null);
   }
 
   // ---- routing ------------------------------------------------------------------

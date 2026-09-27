@@ -4,8 +4,9 @@ role: Personal project
 when: September 2026
 status: Designed
 summary: >-
-  A 4-bit digital-to-analog converter made only of resistors, drawn in KiCad. It
-  turns a 4-bit input into one of 16 output voltages, from 0 to 3.09 V in 0.206 V steps.
+  Four bits in, one voltage out, built from nothing but 10k and 20k
+  resistors. I drew it in KiCad and checked it in SPICE. The board further
+  down is a concept layout to show it fits on 33 by 20 mm; it hasn't been made.
 points:
   - Every node sees 2R to ground, so each bit contributes half as much voltage as the bit above it.
   - Used superposition to show that the output is the input voltage times the binary value over 16.
@@ -14,11 +15,20 @@ links:
   - label: Repository
     url: https://github.com/Quaot/R-2R_DAC
 media:
-  - type: glb
-    src: media/r2r/board.glb
-    alt: Interactive 3D model of a two-layer board for the R-2R ladder, with pads for eight 0805 resistors and two pin headers
-    caption: Concept two-layer layout of the schematic, not fabricated. Drag to rotate.
   - type: image
     src: media/r2r/schematic.svg
     alt: Schematic of the R-2R resistor ladder
-    caption: Schematic.
+    caption: The ladder. Every node looks down at 2R, which is what makes each bit worth half the one above it.
+  - type: image
+    src: media/r2r/process/staircase.png
+    alt: Staircase chart of output voltage for all 16 input codes
+    caption: All 16 codes. Each step is 0.206 V, and code 15 stops at 3.09 V, one step short of 3.3 V.
+  - type: glb
+    src: media/r2r/board.glb
+    alt: Interactive 3D model of a concept two-layer board for the ladder
+    caption: Concept layout, not fabricated. Drag to rotate.
+  - type: image
+    src: media/r2r/process/layers.png
+    dark: true
+    alt: The concept board separated into its layers
+    caption: The concept board, layer by layer.

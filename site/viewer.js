@@ -1,4 +1,5 @@
 // Draws an STL (or a textured GLB) as a shaded part with outlined edges, like a technical drawing.
+// type 'layers' is a GLB of stacked board layers that slowly pull apart and close again.
 // Viewers only start once they scroll into view, and stop rendering when hidden.
 (function () {
   function cssVar(name) {
@@ -31,12 +32,14 @@
     controls.autoRotateSpeed = 1.4;
     controls.addEventListener('start', () => { controls.autoRotate = false; });
 
+    const edgeColor = type === 'layers' ? '#5a5a5a' : (cssVar('--edge') || '#1b2430');
     function outline(geometry) {
       return new THREE.LineSegments(
         new THREE.EdgesGeometry(geometry, 28),
-        new THREE.LineBasicMaterial({ color: new THREE.Color(cssVar('--edge') || '#1b2430') })
+        new THREE.LineBasicMaterial({ color: new THREE.Color(edgeColor) })
       );
     }
+    let layers = [];   // [node, resting height] for type 'layers'
 
     function frame(r) {
       loading.remove();
@@ -48,7 +51,7 @@
     }
     const failed = () => { loading.textContent = 'Model failed to load'; };
 
-    if (type === 'glb') {
+    if (type === 'glb' || type === 'layers') {
       // Textured model (e.g. a PCB), already Y-up and centred. Keep its own colours.
       renderer.outputEncoding = THREE.sRGBEncoding;
       new THREE.GLTFLoader().load(src, (gltf) => {
@@ -59,12 +62,17 @@
           o.material.polygonOffset = true;
           o.material.polygonOffsetFactor = 1;
           o.material.polygonOffsetUnits = 1;
+          if (o.material.transparent) o.material.depthWrite = false;   // stacked see-through layers
           o.add(outline(o.geometry));   // child, so it follows the mesh's transform
+        }
+        if (type === 'layers') {
+          layers = model.children.map((n) => [n, n.position.y]);
+          controls.autoRotateSpeed = 0.6;
         }
         scene.add(model);
         const sphere = new THREE.Box3().setFromObject(model).getBoundingSphere(new THREE.Sphere());
         model.position.sub(sphere.center);
-        frame(sphere.radius * 0.9);   // flat boards look lost in a full bounding-sphere frame
+        frame(sphere.radius * (type === 'layers' ? 1.15 : 0.9));   // flat boards look lost in a full bounding-sphere frame
       }, undefined, failed);
     } else {
       new THREE.STLLoader().load(src, (geometry) => {
@@ -100,6 +108,11 @@
       }
       requestAnimationFrame(loop);
       if (!visible) return;
+      if (layers.length) {
+        const t = performance.now() / 1000;
+        const spread = 0.18 + 0.82 * (0.5 - 0.5 * Math.cos(t * 0.5));
+        for (const [n, y] of layers) n.position.y = y * spread;
+      }
       controls.update();
       renderer.render(scene, camera);
     })();

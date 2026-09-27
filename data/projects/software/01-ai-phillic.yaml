@@ -4,8 +4,10 @@ role: Team of four
 when: 2026
 status: 1st of 8 finalists, $10,000 IDEA-X award
 summary: >-
-  Our winning IDEA-X 2026 entry: a mobile app that teaches source-checking
-  through short lessons, backed by a service that checks a claim against real sources.
+  Four of us built this in grade 12 for IDEA-X, a district challenge on AI
+  and critical thinking. Students learn to check sources through short
+  illustrated stories, then get a tool that does the checking with them.
+  It took first place out of 8 finalists and $10,000.
 points:
   - The app runs lessons as story beats where students tap the claims they think were invented, earning streaks and badges.
   - The service splits a claim into its separate assertions, searches the open web, community sites and scholarly sources, and judges each source for or against the claim, with its reason.
@@ -16,8 +18,22 @@ links:
     url: https://github.com/Quaot/ai-phillic
   - label: IDEA-X announcement
     url: https://www.sd35.bc.ca/idea-x-challenges-students-to-explore-ai-solutions.22609
+cover:
+  src: media/ai-phillic/lesson-001-b2.jpg
+  fit: cover
+cover:
+  src: media/ai-phillic/lesson-001-b2.jpg
+  fit: cover
 media:
   - type: image
-    src: media/ai-phillic/mascot.png
-    alt: The AI-Phillic mascot
-    caption: The AI-Phillic mascot.
+    src: media/ai-phillic/lesson-001-b2.jpg
+    alt: Illustration of a duckling on a log reading a tablet, from lesson one
+    caption: Each lesson is a short illustrated story.
+  - type: image
+    src: media/ai-phillic/lesson-002-b3.jpg
+    alt: Illustration of a beaver with a magnifying glass studying a map on a barrel
+    caption: Students tap the claims they think were made up, then find out why.
+  - type: image
+    src: media/ai-phillic/lesson-003-b2.jpg
+    alt: Illustration of two frogs on a dock holding up maps
+    caption: Lesson art from the app.

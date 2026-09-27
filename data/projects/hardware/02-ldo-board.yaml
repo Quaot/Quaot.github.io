@@ -4,8 +4,9 @@ role: WATonomous hardware onboarding
 when: September 2026
 status: Designed
 summary: >-
-  A two-layer board that steps 5 V down to 3.3 V, designed in Altium. Most of
-  the work was in choosing and justifying each part from the datasheet.
+  My WATonomous hardware onboarding task: a two-layer board that takes 5 V
+  and hands back 3.3 V. The board is small. The real work was in the
+  spreadsheet, making sure every part on it could be defended from a datasheet.
 points:
   - Set the output with a 162 Ω / 267 Ω divider, sized so the regulator always sees its 5 mA minimum load across 0 to 125 °C.
   - Worked through reference and resistor tolerances to show the output stays between 3.20 and 3.44 V, inside the JEDEC 3.15 to 3.45 V narrow range.
@@ -18,16 +19,29 @@ media:
   - type: glb
     src: media/pcb-ldo/board.glb
     alt: Interactive 3D model of the assembled regulator board
-    caption: 3D model from my Gerbers and Altium STEP export. Drag to rotate.
+    caption: The finished design. Board from my Gerbers, parts from my Altium STEP export. Drag to rotate.
   - type: image
-    src: media/pcb-ldo/render.png
-    alt: 3D render of the regulator board
-    caption: 3D render from Altium.
+    src: media/pcb-ldo/process/tolerance.png
+    alt: Chart of the output voltage window, 3.20 to 3.44 V, inside the JEDEC narrow range of 3.15 to 3.45 V
+    caption: "Step one was the worst case: every tolerance stacked against me still lands between 3.20 and 3.44 V."
   - type: image
     src: media/pcb-ldo/schematic.png
     alt: Altium schematic of the LM1117 regulator circuit, with input and output connectors, divider resistors, capacitors and a power LED
-    caption: Schematic, exported from Altium.
+    caption: The schematic. 162 Ω and 267 Ω set the output, and the output cap is tantalum for its ESR.
+  - type: image
+    src: media/pcb-ldo/process/thermal.png
+    alt: Chart of junction temperature against ambient, reaching 116 °C at 45 °C ambient, under the 125 °C limit
+    caption: 0.85 W has to go somewhere. With 194 mm² of copper the junction sits at 116 °C on a 45 °C day, 9 °C under the limit.
   - type: image
     src: media/pcb-ldo/layout.png
     alt: PCB layout of the regulator board, labelled JUSTIN LDO V1
-    caption: PCB layout.
+    caption: The layout, 17 by 28 mm, with the 3.3 V copper pour doing the cooling.
+  - type: image
+    src: media/pcb-ldo/process/layers.png
+    dark: true
+    alt: The board separated into its fabrication layers, bottom copper, board, top copper, solder mask and silkscreen
+    caption: The same board pulled apart into the layers a fab would make, straight from my Gerbers.
+  - type: image
+    src: media/pcb-ldo/render.png
+    alt: 3D render of the regulator board from Altium
+    caption: Altium's own render, for comparison.

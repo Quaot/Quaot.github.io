@@ -4,9 +4,9 @@ role: Personal project
 when: September 2026
 status: Working
 summary: >-
-  A small Windows app in C++. It downloads a video once, remembers where the
-  real content starts, and opens it there every time. Useful for lecture and
-  study videos you replay often.
+  Long YouTube videos love to open with a few minutes of chatter. This small
+  C++ app for Windows downloads a video once, remembers where the real content
+  starts, and opens it there every time.
 points:
   - Turns YouTube chapters into bookmarks, and lets you add your own with a label.
   - Keyboard shortcuts for seeking, jumping between bookmarks and setting the start point.
@@ -15,4 +15,8 @@ stack: [C++, CMake, libVLC, yt-dlp]
 links:
   - label: Repository
     url: https://github.com/Quaot/youtonomous
+cover:
+  poster: {bg: "#1c1c1c", fg: "#f2f2f2"}
+cover:
+  poster: {bg: "#1c1c1c", fg: "#f2f2f2"}
 media: []

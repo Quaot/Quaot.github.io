@@ -59,7 +59,7 @@ img { display: block; max-width: 100%; }
 .lede { padding: 56px 0 72px; max-width: 980px; }
 .big { font-size: clamp(24px, 3.1vw, 40px); line-height: 1.18; letter-spacing: -0.025em; font-weight: 500; margin: 0 0 .5em; }
 .group { margin-bottom: 64px; }
-.group-title { font-size: 18px; font-weight: 400; margin: 0 0 18px; }
+.group-title { font-size: clamp(28px, 3.4vw, 44px); font-weight: 600; letter-spacing: -0.035em; margin: 0 0 22px; }
 .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 44px 28px; }
 .tile { display: block; }
 .cover {
@@ -80,19 +80,6 @@ img { display: block; max-width: 100%; }
 .project-head { padding: 56px 0 36px; max-width: 980px; }
 h1 { font-size: clamp(40px, 6vw, 84px); line-height: 1; letter-spacing: -0.045em; font-weight: 600; margin: 0 0 18px; }
 .project-head .big { margin: 0; }
-.media { margin: 0; }
-.profile .media { margin-top: 24px; }
-.stage { position: relative; aspect-ratio: 16 / 9; background: var(--tile); display: grid; place-items: center; overflow: hidden; }
-.stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: 3%; }
-.stage .viewer { position: absolute; inset: 0; }
-.media figcaption { margin-top: 10px; min-height: 1.4em; }
-.thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-.thumbs button {
-  width: 76px; height: 56px; padding: 4px; border: 1px solid transparent; background: var(--tile);
-  color: var(--fg); font: 500 14px/1 inherit; font-family: inherit; cursor: pointer;
-}
-.thumbs button img { width: 100%; height: 100%; object-fit: contain; }
-.thumbs button[aria-pressed="true"] { border-color: var(--fg); }
 .project-body {
   display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 28px 64px;
   margin-top: 48px;
@@ -112,6 +99,38 @@ h1 { font-size: clamp(40px, 6vw, 84px); line-height: 1; letter-spacing: -0.045em
 }
 .next a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
+/* ---- home hero: the animated layer stack ---- */
+.hero { margin: 0 0 88px; }
+.hero-stage { position: relative; height: min(78vh, 760px); background: #141414; overflow: hidden; }
+.hero-stage .viewer { position: absolute; inset: 0; }
+.hero figcaption { margin-top: 10px; }
+
+/* ---- designed covers ---- */
+.cover.bleed img { object-fit: cover; padding: 0; }
+.cover.dark { background: #141414; }
+.cover.poster { display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; padding: 7%; }
+.cover.poster .logo { position: static; width: 72px; height: 72px; padding: 0; object-fit: contain; border-radius: 16px; }
+.poster-title { font-size: clamp(36px, 5.4vw, 76px); font-weight: 600; letter-spacing: -0.045em; line-height: .95; }
+.tile:hover .poster-title { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 8px; }
+
+/* ---- project page: pictures stacked one after another ---- */
+.stack { display: grid; gap: 56px; margin-top: 72px; }
+.stack-item { margin: 0; }
+.plate { position: relative; background: var(--tile); display: grid; place-items: center; overflow: hidden; }
+.plate img { width: 100%; height: auto; }
+.plate.small, .plate.drawing { padding: clamp(24px, 6vw, 88px); }
+.plate.drawing img { width: min(100%, 560px); }
+.plate.dark { background: #141414; }
+.plate.model { aspect-ratio: 16 / 10; }
+.plate.model .viewer { position: absolute; inset: 0; }
+.stack-item figcaption { display: flex; gap: 14px; margin-top: 12px; font-size: 15px; max-width: 760px; }
+.stack-item .num { font-variant-numeric: tabular-nums; }
+.notes { margin-top: 80px; max-width: 760px; }
+.notes ul { padding-left: 1.1em; margin: 0; }
+.notes li { font-size: 19px; margin-bottom: .6em; }
+.notes li::marker { color: var(--muted); }
+.project-head .muted:first-child { margin: 0 0 10px; }
+
 /* ---- 3D viewers ---- */
 .viewer { position: relative; width: 100%; height: 100%; cursor: grab; touch-action: none; }
 .viewer:active { cursor: grabbing; }
@@ -123,7 +142,6 @@ h1 { font-size: clamp(40px, 6vw, 84px); line-height: 1; letter-spacing: -0.045em
   :root { --gutter: 16px; }
   .grid { grid-template-columns: 1fr; gap: 36px; }
   .project-body { grid-template-columns: 1fr; }
-  .stage { aspect-ratio: 4 / 3; }
   .lede { padding: 28px 0 44px; }
   .project-head { padding: 28px 0 24px; }
   .prose p, .prose li { font-size: 17px; }

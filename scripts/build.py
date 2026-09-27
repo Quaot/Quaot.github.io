@@ -33,6 +33,7 @@ def main():
             errors.append(f"{where}: media file not found: {src}")
 
     check_media((site.get("hero_model") or {}).get("src"), "site.yaml hero_model")
+    check_media((site.get("hero_layers") or {}).get("src"), "site.yaml hero_layers")
 
     categories = []
     for cat in site.get("categories", []):
@@ -44,6 +45,8 @@ def main():
             for key in REQUIRED:
                 if not p.get(key):
                     errors.append(f"{where}: missing '{key}'")
+            check_media((p.get("cover") or {}).get("src"), where)
+            check_media(((p.get("cover") or {}).get("poster") or {}).get("logo"), where)
             for m in p.get("media") or []:
                 check_media(m.get("src"), where)
                 if m.get("type") not in ("image", "stl", "glb"):

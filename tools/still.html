@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<!-- One still frame of a model, for process images. Driven by tools/render_stills.py
+     through headless Edge. Query: src (one or more, comma-separated, laid out left to right),
+     type=stl|glb, az/el (degrees), bg (hex, no #), gap (mm between models). -->
+<html><head><meta charset="utf-8">
+<style>html,body{margin:0;height:100%;overflow:hidden}canvas{display:block}</style>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+</head><body><script>
+const q = new URLSearchParams(location.search);
+const srcs = q.get('src').split(',');
+const type = q.get('type') || 'stl';
+const num = (k, d) => (q.has(k) ? +q.get(k) : d);
+const az = num('az', 35) * Math.PI / 180, el = num('el', 28) * Math.PI / 180;
+const bg = '#' + (q.get('bg') || 'f2f2f2');
+const gap = num('gap', 12);
+document.documentElement.style.background = bg;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+const W = num('w', innerWidth), H = num('h', innerHeight);
+renderer.setSize(W, H);
+if (type === 'glb') renderer.outputEncoding = THREE.sRGBEncoding;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(bg);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 0.85));
+const key = new THREE.DirectionalLight(0xffffff, 0.75); key.position.set(1, 2, 1.4); scene.add(key);
+
+function outline(g) {
+  return new THREE.LineSegments(new THREE.EdgesGeometry(g, 28), new THREE.LineBasicMaterial({ color: new THREE.Color('#' + (q.get('lc') || '111111')) }));
+}
+function load(src) {
+  return new Promise((res) => {
+    if (type === 'glb') new THREE.GLTFLoader().load(src, (g) => {
+      const meshes = []; g.scene.traverse((o) => o.isMesh && meshes.push(o));
+      meshes.forEach((o) => { o.material.polygonOffset = true; o.material.polygonOffsetFactor = 1; if (o.material.transparent) o.material.depthWrite = false; o.add(outline(o.geometry)); });
+      res(g.scene);
+    });
+    else new THREE.STLLoader().load(src, (geo) => {
+      geo.rotateX(-Math.PI / 2); geo.center();
+      const grp = new THREE.Group();
+      grp.add(new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0xe2e2e2, roughness: .8, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 })));
+      grp.add(outline(geo));
+      res(grp);
+    });
+  });
+}
+Promise.all(srcs.map(load)).then((objs) => {
+  let x = 0;
+  objs.forEach((o) => {           // lay parts out in a row along x
+    const b = new THREE.Box3().setFromObject(o);
+    o.position.x = x - b.min.x; o.position.y = -b.min.y;
+    x += b.max.x - b.min.x + gap;
+    scene.add(o);
+  });
+  const box = new THREE.Box3().setFromObject(scene);
+  const c = box.getCenter(new THREE.Vector3());
+  const size = box.getSize(new THREE.Vector3());
+  const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, -1e4, 1e4);
+  cam.position.set(c.x + Math.sin(az) * Math.cos(el) * 1000, c.y + Math.sin(el) * 1000, c.z + Math.cos(az) * Math.cos(el) * 1000);
+  cam.lookAt(c);
+  cam.updateMatrixWorld();
+  // Fit: project the box corners into camera space.
+  let mx = 0, my = 0;
+  for (const X of [box.min.x, box.max.x]) for (const Y of [box.min.y, box.max.y]) for (const Z of [box.min.z, box.max.z]) {
+    const p = new THREE.Vector3(X, Y, Z).applyMatrix4(cam.matrixWorldInverse);
+    mx = Math.max(mx, Math.abs(p.x)); my = Math.max(my, Math.abs(p.y));
+  }
+  const aspect = W / H, pad = num('pad', 1.14);
+  let hw = mx * pad, hh = my * pad;
+  if (hw / hh > aspect) hh = hw / aspect; else hw = hh * aspect;
+  Object.assign(cam, { left: -hw, right: hw, top: hh, bottom: -hh });
+  cam.updateProjectionMatrix();
+  renderer.render(scene, cam);
+  document.title = 'done';
+});
+</script></body></html>

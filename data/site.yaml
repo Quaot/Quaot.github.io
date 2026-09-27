@@ -1,23 +1,27 @@
 # Everything about you that isn't a project. Edit this, then run: python scripts/build.py
 name: Justin Gu
-tagline: Electrical Engineering student at the University of Waterloo, class of 2031. Project lead for Electrium Mobility's electric cargo bike.
+tagline: >-
+  Hi, I'm Justin. I study Electrical Engineering at Waterloo and lead the
+  team building Electrium Mobility's electric cargo bike.
 intro: >-
-  I like projects where the design has to survive contact with something real:
-  a frame that has to carry a rider, a board that has to hold 3.3 V, an app that
-  a student actually opens twice.
+  This is my work with the working left in: the tolerance maths, the test
+  prints, the versions before the final one.
+# The animated layer stack on the home page (a GLB from scripts/layer_stack.py).
+hero_layers:
+  src: media/pcb-ldo/layers.glb
+  caption: My 3.3 V regulator board, pulled apart into the five layers a fab makes. Built from its Gerbers.
 
-# The rotating model at the top of the page. Any STL in media/ works.
+# The rotating model on the profile page. Any STL in media/ works.
 hero_model:
   src: media/printing/enclosure-base.stl
   caption: Enclosure base generated from a KiCad board file by my Python script. Drag to rotate.
 
-about: >-
-  This fall I'm leading Bakfiets, Electrium Mobility's electric cargo bike, and
-  working through WATonomous's hardware onboarding. I'm also one of six academic
-  reps for my Electrical Engineering class. Outside design teams I build
-  software for problems I run into myself: a tool for sorting past papers, a
-  gym tracker, and an app that teaches students to check what they read online.
+about: |-
+  I'm a first-year Electrical Engineering student at the University of Waterloo, class of 2031. Before that I finished the IB Diploma in Langley, BC, with 40 out of 45, and spent a year and a half as a junior coach at Zebra Robotics, keeping three competition teams' robots running and teaching kids to code.
 
+  This fall I'm project lead for Bakfiets, Electrium Mobility's electric cargo bike, and I'm working through WATonomous's hardware onboarding. I'm also one of six academic reps for my class.
+
+  Most of what's on this site started as a spec someone handed me or a problem I kept running into. I like the stage where the numbers have to agree with a datasheet, or a print has to fit on the first try. It rarely does, which is why there are test strips.
 links:
   - label: GitHub
     url: https://github.com/Quaot

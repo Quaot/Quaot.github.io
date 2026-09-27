@@ -4,8 +4,9 @@ role: Personal project
 when: December 2025 to September 2026
 status: Released (v2.1.2)
 summary: >-
-  A Windows desktop app that turns a folder of several hundred IB past papers
-  into a library you can filter, with every mark scheme matched to its paper.
+  After a year of IB revision you end up with several hundred past papers in
+  one folder, all named like MA-24M-P1-1-HL.pdf. This app reads those names,
+  so finding a paper and its mark scheme takes a filter instead of a scroll.
 points:
   - Parses each filename into subject, year, session, timezone, level and paper number, so you filter by what you want instead of reading filenames.
   - Started as a single HTML page in December 2025, then rebuilt as an Electron app with folder scanning and saved settings.
@@ -14,4 +15,8 @@ stack: [Electron, JavaScript]
 links:
   - label: Repository
     url: https://github.com/Quaot/ib-paper-organizer
+cover:
+  poster: {bg: "#0d5ea8", fg: "#ffffff", logo: media/ib-paper-organizer/logo.png}
+cover:
+  poster: {bg: "#0d5ea8", fg: "#ffffff", logo: media/ib-paper-organizer/logo.png}
 media: []
