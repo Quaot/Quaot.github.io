@@ -9,8 +9,7 @@ summary: Bakfiets is Electrium Mobility's electric cargo bike, and this term I l
   an onboarding guide and 30 GitHub issues, and drew the diagrams the team plans its work from.
 points:
 - The CAD, firmware and wiring files were recovered from old branches, with a record of where each one came from.
-- Each GitHub issue lists its steps, dependencies and safety notes, across the mechanical, electrical and firmware
-  subteams.
+- Each GitHub issue lists its steps, dependencies and safety notes, across all three subteams.
 - The planning diagrams cover the power flow, the 12S3P battery pack and the motor controller wiring.
 stack:
 - GitHub

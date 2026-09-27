@@ -4,10 +4,10 @@ role: WATonomous Humanoid Electrical admission assignment
 when: September 2026
 status: Designed
 summary: 'This board is my admission assignment for WATonomous''s Humanoid Electrical team: a two-layer regulator
-  that takes 5 V in and gives 3.3 V out, built around the LM1117. In designing it, I checked every part against
-  its datasheet. As a result, the output stays between 3.20 and 3.44 V with every tolerance at its worst, and the
-  regulator runs at 116 °C on a 45 °C day, under its 125 °C limit. The board measures 17 by 28 mm. Assignments are
-  reviewed as design files, so it has not been manufactured.'
+  that takes 5 V in and gives 3.3 V out, built around the LM1117. Each part choice is worked out from its datasheet
+  in the repository README. With every tolerance at its worst, the output stays between 3.20 and 3.44 V, and the
+  calculated junction temperature is 116 °C on a 45 °C day, under the 125 °C recommended maximum. The board measures
+  17 by 28 mm. Assignments are reviewed as design files, so it has not been manufactured.'
 points:
 - Set the output with a 162 Ω / 267 Ω divider, sized so the regulator always sees its 5 mA minimum load across 0
   to 125 °C.
@@ -26,7 +26,7 @@ media:
 - type: glb
   src: media/pcb-ldo/board.glb
   alt: Interactive 3D model of the assembled regulator board
-  caption: The finished board, from my Gerbers and Altium STEP export. Drag to rotate.
+  caption: The board as modelled from my Gerbers and Altium STEP export. Drag to rotate.
 - type: image
   src: media/pcb-ldo/process/window.svg
   wide: true
@@ -41,7 +41,7 @@ media:
   src: media/pcb-ldo/process/thermal.svg
   wide: true
   alt: Junction temperature of 116 °C at 45 °C ambient, 9 °C under the 125 °C limit
-  caption: The junction temperature at 500 mA, with 194 mm² of copper on the regulator tab.
+  caption: The calculated junction temperature at 500 mA, with 194 mm² of copper on the regulator tab.
 - type: image
   src: media/pcb-ldo/layout.png
   alt: PCB layout of the regulator board, labelled JUSTIN LDO V1
@@ -50,7 +50,7 @@ media:
   src: media/pcb-ldo/process/layers.png
   dark: true
   alt: The board separated into its fabrication layers, bottom copper, board, top copper, solder mask and silkscreen
-  caption: The board separated into its five fabrication layers, taken from the Gerbers.
+  caption: The board separated into five of its fabrication layers, from the Gerbers.
 - type: image
   src: media/pcb-ldo/render.png
   alt: 3D render of the regulator board from Altium

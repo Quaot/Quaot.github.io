@@ -113,7 +113,7 @@ for ref, (x, y), vertical in resistors:
     d = PAD_0805[1] / 2 + 0.25            # body lines beside the pads
     if vertical:
         silk += [[(x - d, y - 0.35), (x - d, y + 0.35)], [(x + d, y - 0.35), (x + d, y + 0.35)]]
-        silk += text(ref, x + 1.25, y - 0.5)
+        silk += text(ref, x + 1.6, y - 0.5)
     else:
         silk += [[(x - 0.35, y - d), (x + 0.35, y - d)], [(x - 0.35, y + d), (x + 0.35, y + d)]]
         silk += text(ref, x, y + 1.35, anchor='center')
@@ -129,6 +129,8 @@ for (px, _), name in zip(J1, ('B0', 'B1', 'B2', 'B3')):
     silk += text(name, px - 1.55, 4.55, h=0.7)   # left of each track, so they don't overlap
 silk += rect(29.1, 12.33, 31.9, 17.67)
 silk += text('J2', 29.45, 18.2)
+silk += text('OUT', 27.3, 16.95, h=0.6)    # pin 1, above the VOUT track
+silk += text('GND', J2[1][0], 11.5, h=0.6, anchor='center')
 silk += text('4-BIT', 26.2, 3.3, h=1.0, anchor='center')
 silk += text('R-2R DAC', 26.2, 1.4, h=1.0, anchor='center')
 

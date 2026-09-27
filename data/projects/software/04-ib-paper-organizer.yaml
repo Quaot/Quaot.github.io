@@ -3,9 +3,9 @@ subtitle: Searchable library for past exam papers
 role: Personal project
 when: 2024 to 2026
 status: Released (v2.1.2)
-summary: IB Paper Organizer is a Windows app that turns a folder of several hundred IB past papers into a searchable
-  library. Each filename is read into subject, year, session, timezone, level and paper number, and every paper
-  is paired with its mark scheme. It started as a single HTML page and has been maintained since 2024.
+summary: A folder of several hundred IB past papers becomes a searchable library in IB Paper Organizer, a Windows
+  app. Each filename is read into subject, year, session, timezone, level and paper number, and every paper is paired
+  with its mark scheme. It started as a single HTML page and has been maintained since 2024.
 points:
 - Papers are filtered by what they are, not by reading filenames.
 - Papers open in the system's PDF reader, and a copy can be saved elsewhere.

@@ -4,9 +4,9 @@ role: Personal project
 when: September 2026
 status: Built and measured
 summary: The R-2R DAC is a 4-bit digital-to-analogue converter made only from 10k and 20k resistors. I drew the
-  schematic in KiCad, simulated all 16 codes in SPICE, and measured each step on an oscilloscope in the E2 lab at
-  the University of Waterloo. The output rises from 0 to 3.09 V in steps of 0.206 V. The circuit board shown here
-  is a concept layout and has not been made.
+  schematic in KiCad, simulated all 16 codes in SPICE, and checked each step on an oscilloscope in the E2 lab at
+  the University of Waterloo. In theory the output rises from 0 to 3.09 V in steps of 0.206 V. The circuit board
+  shown here is a concept layout and has not been made.
 points:
 - Looking back toward RT, every node sees 2R, so each bit contributes half as much voltage as the bit above it.
 - Used superposition to show that the output is the input voltage times the binary value over 16.
@@ -32,7 +32,7 @@ media:
   src: media/r2r/process/steps.svg
   wide: true
   alt: Step line of output voltage for all 16 input codes, from 0 V up to 3.09 V
-  caption: The output for each of the 16 input codes.
+  caption: The ideal output for each of the 16 input codes.
 - type: image
   src: media/r2r/process/layers.png
   dark: true

@@ -50,7 +50,7 @@ def ldo_window():
     b.append(f'<rect x="{X(3.41) - 7}" y="{y - 7}" width="{X(3.44) - X(3.41) + 7}" height="14" rx="7" class="accent"/>')
     b.append(f'<line x1="{X(3.3)}" y1="{y - 40}" x2="{X(3.3)}" y2="{y - 14}" class="line" stroke-width="2"/>')
     b.append(t(X(3.3), y - 52, '3.3 V target', 20, 'ink', 'middle', 500))
-    b.append(t(X(3.41), y - 24, '+30 mV from the ADJ pin current', 20, 'muted'))
+    b.append(t(X(3.41), y - 24, '+32 mV from the ADJ pin current', 20, 'muted'))
     b.append(t(80, 500, 'Low: minimum reference, R1 1% high, R2 1% low.   High: the opposite, plus 120 µA through R2.',
                19, 'muted'))
     svg('pcb-ldo/process/window.svg', ''.join(b))
@@ -62,13 +62,13 @@ def ldo_thermal():
     X = lambda v: x0 + (v - t0) / (t1 - t0) * (x1 - x0)
     y = 360
     tj45, tj25 = 45 + 0.85 * 84, 25 + 0.85 * 84
-    b = [t(80, 90, 'Junction temperature, 500 mA on a 45 °C day', 22, 'muted'),
+    b = [t(80, 90, 'Calculated junction temperature, 500 mA on a 45 °C day', 22, 'muted'),
          t(76, 196, f'{tj45:.0f} °C', 104, 'ink', weight=600),
          t(80, 244, f'0.85 W × 84 °C/W, with 194 mm² of copper on the tab. {tj25:.0f} °C in a 25 °C room.', 20, 'muted')]
     b.append(f'<rect x="{x0}" y="{y - 7}" width="{x1 - x0}" height="14" rx="7" class="track"/>')
     b.append(f'<rect x="{x0}" y="{y - 7}" width="{X(tj45) - x0}" height="14" rx="7" class="ink"/>')
     b.append(f'<line x1="{x1}" y1="{y - 34}" x2="{x1}" y2="{y + 34}" class="accent-line" stroke-width="3"/>')
-    b.append(t(x1, y + 66, '125 °C limit', 20, 'ink', 'end', 500))
+    b.append(t(x1, y + 66, '125 °C recommended max', 20, 'ink', 'end', 500))
     b.append(t(x1 - 16, y - 26, f'{125 - tj45:.0f} °C to spare', 20, 'ink', 'end', 500))
     b.append(t(x0, y + 66, '25 °C', 20, 'muted'))
     svg('pcb-ldo/process/thermal.svg', ''.join(b))
@@ -79,8 +79,8 @@ def r2r_steps():
     x0, x1, y0, y1 = 110, 1120, 480, 150      # plot box; y0 is 0 V, y1 is 3.3 V
     X = lambda c: x0 + c / 16 * (x1 - x0)
     Y = lambda v: y0 - v / 3.3 * (y0 - y1)
-    b = [t(80, 70, 'Output for every 4-bit code', 22, 'muted'),
-         t(80, 118, '16 steps of 0.206 V', 44, 'ink', weight=600)]
+    b = [t(80, 70, 'Ideal output for every 4-bit code', 22, 'muted'),
+         t(80, 118, '16 levels, 0.206 V apart', 44, 'ink', weight=600)]
     for v in (0, 1, 2, 3):
         b.append(f'<line x1="{x0}" y1="{Y(v)}" x2="{x1}" y2="{Y(v)}" class="hair" stroke-width="1.5"/>')
         b.append(t(x0 - 18, Y(v) + 7, f'{v} V', 18, 'muted', 'end'))

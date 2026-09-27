@@ -5,7 +5,7 @@ tagline: This portfolio site shows the work of Justin Gu, Electrical Engineering
 intro: Circuit boards, 3D printed parts and software, shown with the calculations and test pieces behind them.
 hero_layers:
   src: media/pcb-ldo/layers.glb
-  caption: The 3.3 V regulator board, separated into its five fabrication layers.
+  caption: The 3.3 V regulator board, separated into five of its fabrication layers.
 hero_model:
   src: media/printing/enclosure-base.stl
   caption: An enclosure base generated from a KiCad board file. Drag to rotate.
@@ -15,8 +15,8 @@ about: 'I am a first-year Electrical Engineering student at the University of Wa
 
 
   This term I lead Bakfiets, a 25-person team within Electrium Mobility building an electric cargo bike. I was also
-  elected by the 150 students in my Electrical Engineering class as one of six academic representatives, and I am
-  completing the admission assignment for WATonomous''s Humanoid Electrical team.
+  elected by the roughly 150 students in my Electrical Engineering class as one of six academic representatives,
+  and I am completing the admission assignment for WATonomous''s Humanoid Electrical team.
 
 
   If you would like to discuss a co-op position or any of the projects here, contact me at gujustin1@gmail.com.'

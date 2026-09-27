@@ -10,7 +10,7 @@ summary: AI-Phillic was our entry to IDEA-X 2026, a school district challenge on
 points:
 - Lessons are told as short stories, and students tap the claims they think were made up.
 - The service splits a claim into separate statements, searches the web and scholarly sources, and marks each source
-  as for or against the claim.
+  as supporting, contradicting or neutral.
 - Pages the service cannot read are kept and marked for manual checking.
 stack:
 - TypeScript
