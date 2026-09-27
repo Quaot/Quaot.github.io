@@ -37,11 +37,11 @@
         c.poster.logo ? h('img', { class: 'logo', src: c.poster.logo, alt: '' }) : null,
         h('span', { class: 'poster-title' }, p.title));
     } else if (c.src) {
-      cover = h('div', { class: 'cover' + (c.fit === 'cover' ? ' bleed' : '') }, h('img', { src: c.src, alt: '', loading: 'lazy' }));
+      cover = h('div', { class: 'cover' + (c.fit === 'cover' ? ' bleed' : '') }, h('img', { src: c.src, alt: '' }));
     } else if (m && is3D(m)) {
       cover = h('div', { class: 'cover' }, viewer(m, 'still'));
     } else if (m) {
-      cover = h('div', { class: 'cover' + (m.dark ? ' dark' : '') }, h('img', { src: m.src, alt: m.alt || '', loading: 'lazy' }));
+      cover = h('div', { class: 'cover' + (m.dark ? ' dark' : '') }, h('img', { src: m.src, alt: m.alt || '' }));
     } else {
       cover = h('div', { class: 'cover poster' }, h('span', { class: 'poster-title' }, p.title));
     }
@@ -146,7 +146,7 @@
     document.title = title ? `${title.textContent} | ${data.name}` : data.name;
   }
 
-  fetch('data.json').then((r) => r.json()).then((d) => {
+  fetch('data.json', { cache: 'no-cache' }).then((r) => r.json()).then((d) => {
     data = d;
     $$('[data-name]').forEach((el) => { el.textContent = d.name; });
     $$('[data-links]').forEach((el) => el.replaceChildren(...linkList(d.links)));
