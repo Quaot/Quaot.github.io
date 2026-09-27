@@ -3,20 +3,22 @@ subtitle: A YouTube player that skips straight to the content
 role: Personal project
 when: September 2026
 status: Working
-summary: >-
-  Long YouTube videos love to open with a few minutes of chatter. This small
-  C++ app for Windows downloads a video once, remembers where the real content
-  starts, and opens it there every time.
+summary: Youtonomous is a small Windows app for YouTube videos that are watched more than once. It downloads a video,
+  remembers where the content starts, and opens it there every time. YouTube chapters become bookmarks, and more
+  can be added with a label.
 points:
-  - Turns YouTube chapters into bookmarks, and lets you add your own with a label.
-  - Keyboard shortcuts to seek, jump between bookmarks and set the start point.
-  - Uses yt-dlp to download and libVLC to play, with a CMake build and tests.
-stack: [C++, CMake, libVLC, yt-dlp]
+- Keyboard shortcuts move between bookmarks and set the start point.
+- Videos are downloaded with yt-dlp and played with libVLC.
+stack:
+- C++
+- CMake
+- libVLC
+- yt-dlp
 links:
-  - label: Repository
-    url: https://github.com/Quaot/youtonomous
+- label: Repository
+  url: https://github.com/Quaot/youtonomous
 cover:
-  poster: {bg: "#1c1c1c", fg: "#f2f2f2"}
-cover:
-  poster: {bg: "#1c1c1c", fg: "#f2f2f2"}
+  poster:
+    bg: '#1c1c1c'
+    fg: '#f2f2f2'
 media: []

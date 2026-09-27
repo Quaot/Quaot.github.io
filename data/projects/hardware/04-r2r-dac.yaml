@@ -2,35 +2,39 @@ title: R-2R DAC
 subtitle: 4-bit resistor ladder
 role: Personal project
 when: September 2026
-status: Designed
-summary: >-
-  Four bits in, one voltage out, built from nothing but 10k and 20k
-  resistors. I drew it in KiCad and checked it in SPICE. The board further
-  down is a concept layout to show it fits on 33 by 20 mm; it hasn't been made.
+status: Built and measured
+summary: The R-2R DAC is a 4-bit digital-to-analogue converter made only from 10k and 20k resistors. I drew the
+  schematic in KiCad, simulated all 16 codes in SPICE, and measured each step on an oscilloscope in the E2 lab at
+  the University of Waterloo. The output rises from 0 to 3.09 V in steps of 0.206 V. The circuit board shown here
+  is a concept layout and has not been made.
 points:
-  - Looking back toward RT, every node sees 2R, so each bit contributes half as much voltage as the bit above it.
-  - Used superposition to show that the output is the input voltage times the binary value over 16.
-stack: [KiCad, SPICE]
+- Looking back toward RT, every node sees 2R, so each bit contributes half as much voltage as the bit above it.
+- Used superposition to show that the output is the input voltage times the binary value over 16.
+stack:
+- KiCad
+- SPICE
+- Oscilloscope
 links:
-  - label: Repository
-    url: https://github.com/Quaot/R-2R_DAC
+- label: Repository
+  url: https://github.com/Quaot/R-2R_DAC
 media:
-  - type: glb
-    src: media/r2r/board.glb
-    alt: Interactive 3D model of a concept two-layer board for the ladder, with eight 0805 resistors and two pin headers
-    caption: Concept layout with its parts, not fabricated. Drag to rotate.
-  - type: image
-    src: media/r2r/schematic-clean.svg
-    wide: true
-    alt: Schematic of the 4-bit R-2R ladder, four 20k legs from B0 to B3 into a chain of 10k resistors, RT to ground, output at VOUT
-    caption: The ladder, redrawn from my KiCad schematic with the same parts and nets. Looking back toward RT, every node sees 2R, which is what makes each bit worth half the one above it.
-  - type: image
-    src: media/r2r/process/steps.svg
-    wide: true
-    alt: Step line of output voltage for all 16 input codes, from 0 V up to 3.09 V
-    caption: The top code stops one step short of 3.3 V, because the ladder divides by 16, not 15.
-  - type: image
-    src: media/r2r/process/layers.png
-    dark: true
-    alt: The concept board separated into its layers
-    caption: The concept board, layer by layer.
+- type: glb
+  src: media/r2r/board.glb
+  alt: Interactive 3D model of a concept two-layer board for the ladder, with eight 0805 resistors and two pin headers
+  caption: A concept layout of the circuit on a 33 by 20 mm board. Drag to rotate.
+- type: image
+  src: media/r2r/schematic-clean.svg
+  wide: true
+  alt: Schematic of the 4-bit R-2R ladder, four 20k legs from B0 to B3 into a chain of 10k resistors, RT to ground,
+    output at VOUT
+  caption: The schematic, redrawn from the KiCad original with the same parts and connections.
+- type: image
+  src: media/r2r/process/steps.svg
+  wide: true
+  alt: Step line of output voltage for all 16 input codes, from 0 V up to 3.09 V
+  caption: The output for each of the 16 input codes.
+- type: image
+  src: media/r2r/process/layers.png
+  dark: true
+  alt: The concept board separated into its layers
+  caption: The concept board separated into its layers.

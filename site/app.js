@@ -84,6 +84,7 @@
     if (i < 0) return null;
     const { p, c } = all[i];
     const next = all[(i + 1) % all.length].p;
+    const prev = all[(i - 1 + all.length) % all.length].p;
     const facts = [['When', p.when], ['Role', p.role], ['Status', p.status]].filter(([, v]) => v);
     const media = p.media || [];
     return h('article', { class: 'page project' },
@@ -106,8 +107,13 @@
         h('h2', { class: 'sub' }, 'Notes'),
         h('ul', {}, p.points.map((t) => h('li', {}, t)))) : null,
       h('nav', { class: 'next' },
-        h('a', { href: '#/' }, 'All projects'),
-        h('a', { href: `#/p/${next.id}` }, h('span', { class: 'muted' }, 'Next '), next.title)));
+        h('a', { href: `#/p/${prev.id}` }, 'Previous project'),
+        h('a', { href: `#/p/${next.id}` }, 'Next project')),
+      h('section', { class: 'more' },
+        h('h2', { class: 'sub' }, 'More selected projects'),
+        h('ul', {}, all.filter((x) => x.p.id !== p.id).map((x) => h('li', {},
+          h('a', { href: `#/p/${x.p.id}` }, h('span', { class: 'more-title' }, x.p.title),
+            h('span', { class: 'muted' }, x.c.title)))))));
   }
 
   // ---- profile ------------------------------------------------------------------

@@ -2,38 +2,42 @@ title: AI-Phillic
 subtitle: Teaching students to check what they read online
 role: Team of four
 when: 2026
-status: 1st of 8 finalists, $10,000 IDEA-X award
-summary: >-
-  Four of us built this in grade 12 for IDEA-X, a district challenge on AI
-  and critical thinking. Students learn to check sources through short
-  illustrated stories, then get a tool that does the checking with them.
-  It took first place out of 8 finalists and $10,000.
+status: 1st place, $10,000
+summary: AI-Phillic was our entry to IDEA-X 2026, a school district challenge on AI and critical thinking, made
+  by four grade 12 students. Of the 20 teams that entered, 8 reached the final, and AI-Phillic won first place and
+  $10,000. The app teaches students to check what they read online through short illustrated lessons, and a separate
+  service checks a claim against real sources.
 points:
-  - The app runs lessons as story beats where students tap the claims they think were invented, earning streaks and badges.
-  - The service splits a claim into its separate assertions, searches the open web, community sites and scholarly sources, and judges each source for or against the claim, with its reason.
-  - Sources it can't read are returned and marked for manual checking instead of being dropped.
-stack: [TypeScript, Expo, React Native, Express, Zod, Supabase, Vitest]
+- Lessons are told as short stories, and students tap the claims they think were made up.
+- The service splits a claim into separate statements, searches the web and scholarly sources, and marks each source
+  as for or against the claim.
+- Pages the service cannot read are kept and marked for manual checking.
+stack:
+- TypeScript
+- Expo
+- React Native
+- Express
+- Zod
+- Supabase
+- Vitest
 links:
-  - label: Repository
-    url: https://github.com/Quaot/ai-phillic
-  - label: IDEA-X announcement
-    url: https://www.sd35.bc.ca/idea-x-challenges-students-to-explore-ai-solutions.22609
-cover:
-  src: media/ai-phillic/lesson-001-b2.jpg
-  fit: cover
+- label: Repository
+  url: https://github.com/Quaot/ai-phillic
+- label: IDEA-X announcement
+  url: https://www.sd35.bc.ca/idea-x-challenges-students-to-explore-ai-solutions.22609
 cover:
   src: media/ai-phillic/lesson-001-b2.jpg
   fit: cover
 media:
-  - type: image
-    src: media/ai-phillic/lesson-001-b2.jpg
-    alt: Illustration of a duckling on a log reading a tablet, from lesson one
-    caption: Each lesson is a short illustrated story.
-  - type: image
-    src: media/ai-phillic/lesson-002-b3.jpg
-    alt: Illustration of a beaver with a magnifying glass studying a map on a barrel
-    caption: Students tap the claims they think were made up, then find out why.
-  - type: image
-    src: media/ai-phillic/lesson-003-b2.jpg
-    alt: Illustration of two frogs on a dock holding up maps
-    caption: Lesson art from the app.
+- type: image
+  src: media/ai-phillic/lesson-001-b2.jpg
+  alt: Illustration of a duckling on a log reading a tablet, from lesson one
+  caption: An illustration from the first lesson.
+- type: image
+  src: media/ai-phillic/lesson-002-b3.jpg
+  alt: Illustration of a beaver with a magnifying glass studying a map on a barrel
+  caption: An illustration from the second lesson.
+- type: image
+  src: media/ai-phillic/lesson-003-b2.jpg
+  alt: Illustration of two frogs on a dock holding up maps
+  caption: An illustration from the third lesson.

@@ -3,40 +3,46 @@ subtitle: Electrium Mobility electric cargo bike
 role: Project lead
 when: Fall 2026
 status: In progress
-summary: >-
-  Electrium Mobility's electric cargo bike. The 2024 team designed the frame
-  and cargo box and got partway through the build. This term I lead the
-  25 people finishing it, and the first thing I did was make the project
-  something a brand-new member could pick up on their own.
+summary: Bakfiets is Electrium Mobility's electric cargo bike, and this term I lead the 25-person team finishing
+  it, one of several projects in a club of about 70 members. The 2024 team designed the frame and cargo box and
+  started the build. To help new members get going, I gathered the 2024 and 2025 files into one repository, wrote
+  an onboarding guide and 30 GitHub issues, and drew the diagrams the team plans its work from.
 points:
-  - Recovered the 2024 and 2025 CAD, firmware and wiring files from old branches and organised them into one repo, with a record of where each file came from.
-  - Wrote the onboarding guide and 30 GitHub issues across all three subteams, each with steps, dependencies and safety notes.
-  - Drew the system diagrams used in onboarding, including power flow, the 12S3P battery pack and the motor controller wiring.
-stack: [GitHub, Python, SolidWorks, KiCad, ESP32-S3, VESC]
+- The CAD, firmware and wiring files were recovered from old branches, with a record of where each one came from.
+- Each GitHub issue lists its steps, dependencies and safety notes, across the mechanical, electrical and firmware
+  subteams.
+- The planning diagrams cover the power flow, the 12S3P battery pack and the motor controller wiring.
+stack:
+- GitHub
+- Python
+- SolidWorks
+- KiCad
+- ESP32-S3
+- VESC
 links:
-  - label: Repository
-    url: https://github.com/Electrium-Mobility/Bakfiets-F26
+- label: Repository
+  url: https://github.com/Electrium-Mobility/Bakfiets-F26
 media:
-  - type: image
-    src: media/bakfiets/frame-and-box.png
-    alt: SolidWorks assembly of the bakfiets frame with the wooden cargo box mounted in front
-    caption: Frame and cargo box in SolidWorks, designed by the 2024 team. Pulled from the assembly file's preview.
-  - type: image
-    src: media/bakfiets/process/jig.png
-    alt: The welding jig, a board with brackets holding each frame tube in position
-    caption: The 2024 team's welding jig, which holds every tube in place while the frame is joined.
-  - type: stl
-    src: media/bakfiets/notching-guide.stl
-    caption: A printable guide for notching tube ends before welding, from the same build. Drag to rotate.
-  - type: image
-    src: media/bakfiets/process/cargo-box.png
-    alt: SolidWorks model of a curved cargo box on the frame
-    caption: A second cargo box design from the same files.
-  - type: image
-    src: media/bakfiets/onboarding-path.png
-    alt: Onboarding path diagram, from setup through each subteam's stages to the term projects
-    caption: The onboarding path I drew, so a new member always knows the next step.
-  - type: image
-    src: media/bakfiets/power-flow.png
-    alt: Power flow diagram of the bike, from charger and battery through the motor controller to the electronics
-    caption: How power moves through the bike, drawn for the electrical onboarding.
+- type: image
+  src: media/bakfiets/frame-and-box.png
+  alt: SolidWorks assembly of the bakfiets frame with the wooden cargo box mounted in front
+  caption: The frame and cargo box, designed by the 2024 team in SolidWorks.
+- type: image
+  src: media/bakfiets/process/jig.png
+  alt: The welding jig, a board with brackets holding each frame tube in position
+  caption: The welding jig from the 2024 build, which holds each frame tube in position.
+- type: stl
+  src: media/bakfiets/notching-guide.stl
+  caption: A printable guide for notching the tube ends before welding. Drag to rotate.
+- type: image
+  src: media/bakfiets/process/cargo-box.png
+  alt: SolidWorks model of a curved cargo box on the frame
+  caption: A second cargo box design from the same files.
+- type: image
+  src: media/bakfiets/onboarding-path.png
+  alt: Onboarding path diagram, from setup through each subteam's stages to the term projects
+  caption: The onboarding path for new members, from setup to their first project.
+- type: image
+  src: media/bakfiets/power-flow.png
+  alt: Power flow diagram of the bike, from charger and battery through the motor controller to the electronics
+  caption: The power flow through the bike, drawn to plan the electrical work.

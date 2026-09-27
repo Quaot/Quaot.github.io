@@ -1,41 +1,34 @@
 # Everything about you that isn't a project. Edit this, then run: python scripts/build.py
 name: Justin Gu
-tagline: >-
-  Hi, I'm Justin. I study Electrical Engineering at Waterloo and lead the
-  team building Electrium Mobility's electric cargo bike.
-intro: >-
-  This is my work with the working left in: the tolerance maths, the test
-  prints, the versions before the final one.
-# The animated layer stack on the home page (a GLB from scripts/layer_stack.py).
+tagline: This portfolio site shows the work of Justin Gu, Electrical Engineering student at the University of Waterloo
+  and project lead of Bakfiets at Electrium Mobility.
+intro: Circuit boards, 3D printed parts and software, shown with the calculations and test pieces behind them.
 hero_layers:
   src: media/pcb-ldo/layers.glb
-  caption: My 3.3 V regulator board, pulled apart into the five layers a fab makes. Built from its Gerbers.
-
-# The rotating model on the profile page. Any STL in media/ works.
+  caption: The 3.3 V regulator board, separated into its five fabrication layers.
 hero_model:
   src: media/printing/enclosure-base.stl
-  caption: Enclosure base generated from a KiCad board file by my Python script. Drag to rotate.
+  caption: An enclosure base generated from a KiCad board file. Drag to rotate.
+about: 'I am a first-year Electrical Engineering student at the University of Waterloo, class of 2031. Before Waterloo,
+  I completed the IB Diploma in Langley, BC, with a score of 40 out of 45, and worked as a robotics coach at Zebra
+  Robotics, where classes were mostly in Scratch and Python.
 
-about: |-
-  I'm a first-year Electrical Engineering student at the University of Waterloo, class of 2031. Before that I finished the IB Diploma in Langley, BC, with 40 out of 45, and spent a year and a half as a junior coach at Zebra Robotics, keeping three competition teams' robots running and teaching kids to code.
 
-  This fall I'm project lead for Bakfiets, Electrium Mobility's electric cargo bike, and I'm doing the admission assignment for WATonomous's Humanoid Electrical team. I'm also one of six academic reps for my class.
+  This term I lead Bakfiets, a 25-person team within Electrium Mobility building an electric cargo bike. I was also
+  elected by the 150 students in my Electrical Engineering class as one of six academic representatives, and I am
+  completing the admission assignment for WATonomous''s Humanoid Electrical team.
 
-  Most of what's on this site started as a spec someone handed me or a problem I kept running into. I like the stage where the numbers have to agree with a datasheet, or a print has to fit on the first try. It rarely does, which is why there are test strips.
+
+  If you would like to discuss a co-op position or any of the projects here, contact me at gujustin1@gmail.com.'
 links:
-  - label: GitHub
-    url: https://github.com/Quaot
-  # Add these when you're ready. Leave them commented out to hide them.
-  - label: LinkedIn
-    url: https://www.linkedin.com/in/gujustin/
-  - label: Email
-    url: mailto:gujustin1@gmail.com
-  # - label: Resume
-  #   url: media/resume.pdf
-
-# Section order and titles. Each id matches a folder under data/projects/.
+- label: GitHub
+  url: https://github.com/Quaot
+- label: LinkedIn
+  url: https://www.linkedin.com/in/gujustin/
+- label: Email
+  url: mailto:gujustin1@gmail.com
 categories:
-  - id: hardware
-    title: Hardware
-  - id: software
-    title: Software
+- id: hardware
+  title: Hardware
+- id: software
+  title: Software

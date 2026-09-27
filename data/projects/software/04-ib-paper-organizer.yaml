@@ -1,22 +1,23 @@
 title: IB Paper Organizer
 subtitle: Searchable library for past exam papers
 role: Personal project
-when: December 2025 to September 2026
+when: 2024 to 2026
 status: Released (v2.1.2)
-summary: >-
-  After a year of IB revision you end up with several hundred past papers in
-  one folder, all named like MA-24M-P1-1-HL.pdf. This app reads those names,
-  so finding a paper and its mark scheme takes a filter instead of a scroll.
+summary: IB Paper Organizer is a Windows app that turns a folder of several hundred IB past papers into a searchable
+  library. Each filename is read into subject, year, session, timezone, level and paper number, and every paper
+  is paired with its mark scheme. It started as a single HTML page and has been maintained since 2024.
 points:
-  - Parses each filename into subject, year, session, timezone, level and paper number, so you filter by what you want instead of reading filenames.
-  - Started as a single HTML page in December 2025, then rebuilt as an Electron app with folder scanning and saved settings.
-  - Only the main process touches the disk; the page gets a small set of allowed operations through the preload script.
-stack: [Electron, JavaScript]
+- Papers are filtered by what they are, not by reading filenames.
+- Papers open in the system's PDF reader, and a copy can be saved elsewhere.
+stack:
+- Electron
+- JavaScript
 links:
-  - label: Repository
-    url: https://github.com/Quaot/ib-paper-organizer
+- label: Repository
+  url: https://github.com/Quaot/ib-paper-organizer
 cover:
-  poster: {bg: "#0d5ea8", fg: "#ffffff", logo: media/ib-paper-organizer/logo.png}
-cover:
-  poster: {bg: "#0d5ea8", fg: "#ffffff", logo: media/ib-paper-organizer/logo.png}
+  poster:
+    bg: '#0d5ea8'
+    fg: '#ffffff'
+    logo: media/ib-paper-organizer/logo.png
 media: []
