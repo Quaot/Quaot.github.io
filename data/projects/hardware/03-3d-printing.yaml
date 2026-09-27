@@ -20,5 +20,5 @@ media:
     src: media/printing/sensor-mount.stl
     caption: Sensor mount insert (version 5). Drag to rotate.
   - type: stl
-    src: media/printing/switch-cap.stl
-    caption: Switch fidget bottom cap, generated from parameters.
+    src: media/printing/switch-fidget-exploded.stl
+    caption: "Switch fidget, exploded: bottom cap, housing, keycap (switch not shown). Generated from parameters, not printed yet."
