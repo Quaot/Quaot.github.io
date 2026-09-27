@@ -75,7 +75,7 @@
         img.parentElement.classList.add('small');
       }
     });
-    return h('div', { class: 'plate' + (m.dark ? ' dark' : '') + (m.src.endsWith('.svg') ? ' drawing' : '') }, img);
+    return h('div', { class: 'plate' + (m.dark ? ' dark' : '') + (m.src.endsWith('.svg') && !m.wide ? ' drawing' : '') }, img);
   }
 
   function projectView(d, id) {

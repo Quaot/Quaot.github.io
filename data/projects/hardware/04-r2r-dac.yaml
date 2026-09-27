@@ -15,18 +15,19 @@ links:
   - label: Repository
     url: https://github.com/Quaot/R-2R_DAC
 media:
+  - type: glb
+    src: media/r2r/board.glb
+    alt: Interactive 3D model of a concept two-layer board for the ladder, with eight 0805 resistors and two pin headers
+    caption: Concept layout with its parts, not fabricated. Drag to rotate.
   - type: image
-    src: media/r2r/schematic.svg
-    alt: Schematic of the R-2R resistor ladder
-    caption: The ladder. Every node looks down at 2R, which is what makes each bit worth half the one above it.
+    src: media/r2r/schematic-clean.svg
+    wide: true
+    alt: Schematic of the 4-bit R-2R ladder, four 20k legs from B0 to B3 into a chain of 10k resistors, RT to ground, output at VOUT
+    caption: The ladder, redrawn from my KiCad schematic with the same parts and nets. Every node looks down at 2R, which is what makes each bit worth half the one above it.
   - type: image
     src: media/r2r/process/staircase.png
     alt: Staircase chart of output voltage for all 16 input codes
     caption: All 16 codes. Each step is 0.206 V, and code 15 stops at 3.09 V, one step short of 3.3 V.
-  - type: glb
-    src: media/r2r/board.glb
-    alt: Interactive 3D model of a concept two-layer board for the ladder
-    caption: Concept layout, not fabricated. Drag to rotate.
   - type: image
     src: media/r2r/process/layers.png
     dark: true

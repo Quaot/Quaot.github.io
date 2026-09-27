@@ -246,7 +246,32 @@ def main():
     (OUT / f'{prefix}.TXT').write_text('\n'.join(drill + ['M30']) + '\n')
 
     check_clearance()
+    write_parts()
     print(f'wrote {len(list(OUT.iterdir()))} files to {OUT}')
+
+
+def write_parts():
+    """Simple component bodies for the 3D model (scripts/gerbers_to_glb.py --boxes).
+
+    Each box: name, centre x/y in board mm, bottom z (0 = top of board), size, colour.
+    0805 resistors are a dark body with tinned end caps; headers a black base with gold pins.
+    """
+    import json
+    boxes = []
+    body, cap = (1.3, 1.25, 0.5), (0.35, 1.25, 0.5)
+    for ref, (x, y), vertical in resistors:
+        for dx, size, colour in ((0, body, '#1e1e1e'), (-0.825, cap, '#c9c9c9'), (0.825, cap, '#c9c9c9')):
+            sx, sy, sz = size
+            cx, cy = (x, y + dx) if vertical else (x + dx, y)
+            boxes.append([ref, cx, cy, 0.0, (sy, sx, sz) if vertical else (sx, sy, sz), colour])
+    for ref, pins, along_x in (('J1', J1, True), ('J2', J2, False)):
+        xs, ys = [p[0] for p in pins], [p[1] for p in pins]
+        n = len(pins)
+        size = (n * 2.54, 2.54, 2.5) if along_x else (2.54, n * 2.54, 2.5)
+        boxes.append([ref, sum(xs) / n, sum(ys) / n, 0.0, size, '#151515'])
+        for x, y in pins:
+            boxes.append([ref, x, y, -3.0 - 1.6, (0.64, 0.64, 3.0 + 1.6 + 8.5), '#d6ab45'])
+    (OUT.parent / 'parts.json').write_text(json.dumps(boxes, indent=1))
 
 
 # Net of each track (same order as `tracks`) and of each pad, for the clearance check.

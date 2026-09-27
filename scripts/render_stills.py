@@ -35,6 +35,8 @@ JOBS = {
                    dict(az=35, el=30, bg='141414', lc='5a5a5a'), (1600, 1500)),
     'ldo-assembled': ('pcb-ldo/process/assembled.png', [ROOT / 'media/pcb-ldo/board.glb'], 'glb',
                       dict(az=-30, el=30), (1600, 1100)),
+    'r2r-assembled': ('r2r/process/assembled.png', [ROOT / 'media/r2r/board.glb'], 'glb',
+                      dict(az=-30, el=32), (1600, 1100)),
     'r2r-layers': ('r2r/process/layers.png', [ROOT / 'media/r2r/layers.glb'], 'glb',
                    dict(az=35, el=30, bg='141414', lc='5a5a5a'), (1600, 1300)),
 }

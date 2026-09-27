@@ -157,6 +157,7 @@ def main():
     ap.add_argument('--prefix', default='PCB1')
     ap.add_argument('--outline', help='board extent in Gerber mm: X0,Y0,X1,Y1')
     ap.add_argument('--parts', type=Path, help='STEP export of the assembled board')
+    ap.add_argument('--boxes', type=Path, help='JSON list of simple part bodies (see cad/r2r-dac/make_pcb.py)')
     args = ap.parse_args()
     g = lambda ext: str(args.gerbers / f'{args.prefix}.{ext}')
 
@@ -198,6 +199,16 @@ def main():
     barrels = trimesh.util.concatenate([wall(r, outward=False) for r in board.interiors])
     barrels.visual = trimesh.visual.TextureVisuals(material=solid(BARREL))
     scene.add_geometry(barrels, geom_name='barrels')
+
+    if args.boxes:
+        import json
+        for name, x, y, z, (sx, sy, sz), colour in json.loads(args.boxes.read_text()):
+            part = trimesh.creation.box((sx, sz, sy))
+            part.apply_translation((x - cx, THICKNESS / 2 + z + sz / 2, -(y - cy)))
+            rgb = [int(colour[i:i + 2], 16) for i in (1, 3, 5)]
+            part.visual = trimesh.visual.TextureVisuals(material=trimesh.visual.material.PBRMaterial(
+                baseColorFactor=rgb + [255], metallicFactor=0.3 if rgb[0] > 150 else 0.0, roughnessFactor=0.5))
+            scene.add_geometry(part, geom_name=name)
 
     if args.parts:
         for name, mesh in step_parts(args.parts, (x0, y0, x1, y1), (cx, cy)):
