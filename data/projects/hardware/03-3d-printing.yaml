@@ -1,0 +1,24 @@
+title: 3D printing
+subtitle: Fusion 360 and parametric Python CAD
+role: Personal projects
+when: 2025 to now
+status: Two printed, two in progress
+summary: >-
+  Parts designed in Fusion 360 and in Python with build123d, printed in PLA on
+  an Anycubic Mega Pro. The newer ones are generated from parameters, with
+  automated checks that run on every push.
+points:
+  - "IB Physics sensor mount: a 100 mm holder with insert discs, refined over five versions and a set of fit-test strips before the final print."
+  - "Switch fidget: a pocket toy built around a mechanical keyboard switch, with printable test coupons to dial in the fit before printing the real part."
+  - "PCB enclosure generator: reads a KiCad board file and builds a case with standoffs under each mounting hole and openings for chosen connectors."
+stack: [Fusion 360, Python, build123d, KiCad, Cura, GitHub Actions]
+links:
+  - label: Repository
+    url: https://github.com/Quaot/3d-printing
+media:
+  - type: stl
+    src: media/printing/sensor-mount.stl
+    caption: Sensor mount insert (version 5). Drag to rotate.
+  - type: stl
+    src: media/printing/switch-cap.stl
+    caption: Switch fidget bottom cap, generated from parameters.

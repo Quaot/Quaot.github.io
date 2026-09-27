@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Justin Gu</title>
+  <meta name="description" content="Projects by Justin Gu: hardware and software.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar wrap">
+    <a class="mark" href="#top" data-name>&nbsp;</a>
+    <nav>
+      <a href="#hardware">Hardware</a>
+      <a href="#software">Software</a>
+      <a href="#about">About</a>
+    </nav>
+  </header>
+
+  <main id="top" class="wrap">
+    <section class="hero">
+      <div class="hero-text">
+        <p class="label">Portfolio / 2026</p>
+        <h1 data-name></h1>
+        <p class="tagline" data-tagline></p>
+        <p class="intro" data-intro></p>
+        <div class="links" data-links></div>
+      </div>
+      <figure class="hero-model">
+        <div class="viewer frame" data-hero-viewer></div>
+        <figcaption class="label" data-hero-caption></figcaption>
+      </figure>
+    </section>
+
+    <div data-categories></div>
+
+    <section id="about" class="about">
+      <h2 class="section-title"><span class="num">&nbsp;</span>About</h2>
+      <p data-about></p>
+      <div class="links" data-links></div>
+    </section>
+  </main>
+
+  <footer class="wrap footer label">
+    <span>&copy; <span data-year></span> <span data-name></span></span>
+    <span>Built from YAML with a small Python script. Models drawn with three.js.</span>
+  </footer>
+
+  <noscript><p class="wrap">This page needs JavaScript to load the projects.</p></noscript>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="viewer.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

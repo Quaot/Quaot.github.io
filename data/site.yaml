@@ -1,0 +1,36 @@
+# Everything about you that isn't a project. Edit this, then run: python scripts/build.py
+name: Justin Gu
+tagline: Engineering student at the University of Waterloo. Project lead for Electrium Mobility's electric cargo bike.
+intro: >-
+  I like projects where the design has to survive contact with something real:
+  a frame that has to carry a rider, a board that has to hold 3.3 V, an app that
+  a student actually opens twice.
+
+# The rotating model at the top of the page. Any STL in media/ works.
+hero_model:
+  src: media/printing/enclosure-base.stl
+  caption: Enclosure base generated from a KiCad board file by my Python script. Drag to rotate.
+
+about: >-
+  This fall I'm leading Bakfiets, Electrium Mobility's electric cargo bike, and
+  working through WATonomous's hardware onboarding. Outside design teams I build
+  software for problems I run into myself: a tool for sorting past papers, a
+  gym tracker, and an app that teaches students to check what they read online.
+
+links:
+  - label: GitHub
+    url: https://github.com/Quaot
+  # Add these when you're ready. Leave them commented out to hide them.
+  # - label: LinkedIn
+  #   url: https://www.linkedin.com/in/your-handle
+  # - label: Email
+  #   url: mailto:you@example.com
+  # - label: Resume
+  #   url: media/resume.pdf
+
+# Section order and titles. Each id matches a folder under data/projects/.
+categories:
+  - id: hardware
+    title: Hardware
+  - id: software
+    title: Software

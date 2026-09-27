@@ -1,0 +1,29 @@
+title: Bakfiets F26
+subtitle: Electrium Mobility electric cargo bike
+role: Project lead
+when: Fall 2026
+status: In progress
+summary: >-
+  Leading a student team that is finishing an electric cargo bike the 2024 team
+  partly built. I rebuilt the project's repository so a first-year member with
+  no experience can get from setup to a first real task on their own.
+points:
+  - Recovered the 2024 and 2025 CAD, firmware and wiring files from old branches and organised them into one repo, with a record of where each file came from.
+  - Wrote the onboarding guide and 30 GitHub issues for the mechanical, electrical and firmware subteams, each with steps, dependencies and safety notes.
+  - Drew the system diagrams used in onboarding, including power flow, the 12S3P battery pack and the motor controller wiring.
+stack: [GitHub, Python, SolidWorks, KiCad, ESP32-S3, VESC]
+links:
+  - label: Repository
+    url: https://github.com/Electrium-Mobility/Bakfiets-F26
+media:
+  - type: image
+    src: media/bakfiets/onboarding-path.png
+    alt: Onboarding path diagram, from setup through each subteam's stages to the term projects
+    caption: The onboarding path I drew for new members.
+  - type: image
+    src: media/bakfiets/power-flow.png
+    alt: Power flow diagram of the bike, from charger and battery through the motor controller to the electronics
+    caption: How power flows through the bike.
+  - type: stl
+    src: media/bakfiets/notching-guide.stl
+    caption: A 3D-printable tube notching guide from the 2024 team's frame build. Drag to rotate.

@@ -1,0 +1,24 @@
+title: IronLog
+subtitle: Offline gym tracker for iPhone and the web
+role: Personal project
+when: 2026
+status: Live
+summary: >-
+  A phone-first workout tracker. It installs as a web app or builds as an
+  iPhone app from the same source, runs entirely on the device, and works with
+  no signal, no account and nothing to pay for.
+points:
+  - Weight and reps are logged on scrolling tape sliders built for one thumb, with each set pre-filled by a progression engine that explains its suggestion.
+  - Follows a ten-day split and tracks each exercise across splits, with progress views over a month or a year.
+  - Interface rules, such as how screens slide and how copy is written, are enforced by automated tests against the rendered app.
+stack: [TypeScript, React, PWA, iOS, Playwright]
+links:
+  - label: Open the app
+    url: https://quaot.github.io/ironlog/
+  - label: Repository
+    url: https://github.com/Quaot/ironlog
+media:
+  - type: image
+    src: media/ironlog/icon.png
+    alt: IronLog app icon
+    caption: App icon.

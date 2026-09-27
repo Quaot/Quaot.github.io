@@ -1,0 +1,25 @@
+title: 3.3 V regulator board
+subtitle: 2-layer PCB with an LM1117 LDO
+role: WATonomous hardware onboarding
+when: September 2026
+status: Designed
+summary: >-
+  A two-layer board that steps 5 V down to 3.3 V, designed in Altium. Most of
+  the work was in choosing and justifying each part from the datasheet.
+points:
+  - Set the output with a 162 Ω / 267 Ω divider, sized so the regulator always sees its 5 mA minimum load across 0 to 125 °C.
+  - Worked through reference and resistor tolerances to show the output stays between 3.20 and 3.44 V, inside the JEDEC 3.15 to 3.45 V narrow range.
+  - Checked dropout at 500 mA, so the board keeps regulating down to a 4.55 V input.
+stack: [Altium Designer, LM1117, Excel]
+links:
+  - label: Repository
+    url: https://github.com/Quaot/2-layer-PCB-LDO
+media:
+  - type: image
+    src: media/pcb-ldo/render.png
+    alt: 3D render of the regulator board
+    caption: 3D render from Altium.
+  - type: image
+    src: media/pcb-ldo/schematic.png
+    alt: Schematic of the LM1117 regulator circuit
+    caption: Schematic.
