@@ -1,0 +1,52 @@
+title: Rolling wheel experiment
+category: Physics Experiment
+summary: |
+  My IB Physics internal assessment asked whether moving mass away from a wheel's axle makes it lose more energy
+  rolling down a ramp.
+
+  I designed the wheel in Fusion 360 and printed it in PLA: a 97 mm hollow shell with a spoked insert that holds
+  twelve steel dowels. Two inserts with offset holes give 16 dowel positions, from 7.5 to 45 mm out from the axle,
+  which sets the moment of inertia anywhere from 1.13 to 1.92 × 10⁻⁴ kg·m². The insert went through five versions,
+  with thin test strips printed to check the fit first.
+
+  Each position was rolled 30 times down a 1.5 m ramp at 8°, 480 rolls in all, filmed at 120 frames per second
+  and tracked frame by frame in Tracker. The energy lost is the drop in potential energy minus the kinetic energy
+  at the bottom, with every measurement uncertainty carried through to the result.
+
+  The result was inconclusive. The line of best fit has a slope of 100 ± 400 J per kg·m², with R² = 0.07. The
+  range of moments of inertia was too narrow, the printed shell was up to 0.5 mm out of round and wobbled, and the
+  centre mark used for tracking was slightly off. Next time I would use heavier dowels and print the shell
+  oversize, then sand it round.
+cover:
+  src: media/physics/wheel.jpg
+media:
+- type: image
+  src: media/physics/wheel.jpg
+  alt: The printed wheel, a white hollow shell with twelve perforated spokes, shown empty and with steel dowels near
+    the axle
+- type: image
+  src: media/physics/model.jpg
+  alt: Drawing of the wheel on the ramp, labelling the hollow shell, the spokes and the steel dowels
+- type: image
+  src: media/physics/setup.jpg
+  alt: Drawing of the experiment, the wheel released against a straight edge at the top of a wooden ramp and filmed
+    by a camera beside a ruler at the bottom
+- type: image
+  src: media/physics/beams.jpg
+  alt: The two spoke designs, with holes 5 mm apart starting 7.5 mm and 10 mm from the centre
+- type: image
+  src: media/physics/insert.jpg
+  alt: One complete insert, six spokes fused at the centre
+- type: stl
+  src: media/physics/insert.stl
+  alt: Interactive 3D model of the final spoked insert
+- type: image
+  src: media/physics/process/insert-versions.png
+  alt: Four insert designs side by side, versions 2 to 5
+- type: image
+  src: media/physics/process/fit-tests.png
+  alt: Thin test strips and a short test ring
+- type: image
+  src: media/physics/result.jpg
+  alt: Graph of energy loss against moment of inertia for the 16 dowel positions, with error bars, a nearly flat line
+    of best fit and the steepest and shallowest lines the error bars allow

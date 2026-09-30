@@ -33,4 +33,4 @@ categories:
 - id: software
   title: Software
 # Order of the home grid, Previous/Next Project and the thumbnails.
-order: [ldo-board, ai-phillic, bakfiets, r2r-dac, ironlog, 3d-printing, ib-paper-organizer, youtonomous]
+order: [ldo-board, ai-phillic, bakfiets, r2r-dac, ironlog, rolling-wheel, 3d-printing, ib-paper-organizer, youtonomous]
