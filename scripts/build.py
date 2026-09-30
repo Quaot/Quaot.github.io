@@ -13,6 +13,7 @@ import sys
 from pathlib import Path
 
 import yaml
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA, MEDIA, SITE = ROOT / "data", ROOT / "media", ROOT / "site"
@@ -22,6 +23,18 @@ REQUIRED = ["title", "summary"]
 def load(path):
     with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f) or {}
+
+
+def cover_aspect(p):
+    """Width over height of the picture the home grid shows, so the two columns can be balanced."""
+    src = (p.get("cover") or {}).get("src")
+    first = (p.get("media") or [{}])[0]
+    if not src and first.get("type") == "image":
+        src = first.get("src")
+    if not src or src.endswith(".svg"):
+        return round(4 / 3, 4)
+    with Image.open(ROOT / src) as im:
+        return round(im.width / im.height, 4)
 
 
 def main():
@@ -52,6 +65,8 @@ def main():
                 if m.get("type") not in ("image", "stl", "glb"):
                     errors.append(f"{where}: media type must be image, stl or glb, got {m.get('type')!r}")
             p["id"] = path.stem.split("-", 1)[-1]
+            if not errors:
+                p["cover_aspect"] = cover_aspect(p)
             projects.append(p)
         categories.append({"id": cat["id"], "title": cat.get("title", cat["id"]), "projects": projects})
 

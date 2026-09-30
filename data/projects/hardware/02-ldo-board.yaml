@@ -1,57 +1,40 @@
 title: 3.3 V regulator board
-subtitle: 2-layer PCB with an LM1117 LDO
-role: WATonomous Humanoid Electrical admission assignment
-when: September 2026
-status: Designed
-summary: 'This board is my admission assignment for WATonomous''s Humanoid Electrical team: a two-layer regulator
-  that takes 5 V in and gives 3.3 V out, built around the LM1117. Each part choice is worked out from its datasheet
-  in the repository README. With every tolerance at its worst, the output stays between 3.20 and 3.44 V, and the
-  calculated junction temperature is 116 °C on a 45 °C day, under the 125 °C recommended maximum. The board measures
-  17 by 28 mm. Assignments are reviewed as design files, so it has not been manufactured.'
-points:
-- Set the output with a 162 Ω / 267 Ω divider, sized so the regulator always sees its 5 mA minimum load across 0
-  to 125 °C.
-- Worked through reference and resistor tolerances to show the output stays between 3.20 and 3.44 V, including the
-  current the ADJ pin draws.
-- Checked dropout at 500 mA. The board keeps regulating down to a 4.55 V input, or 4.69 V if the output sits at
-  its 3.44 V worst case.
-stack:
-- Altium Designer
-- LM1117
-- Excel
+category: PCB Design
+summary: |
+  A two-layer board that takes 5 V in and gives 3.3 V out, built around the LM1117. It is my admission assignment
+  for WATonomous's Humanoid Electrical team.
+
+  Each part choice is worked out from its datasheet in the repository README. A 162 Ω and 267 Ω divider sets the
+  output and keeps the regulator above its 5 mA minimum load from 0 to 125 °C. With every tolerance at its worst,
+  the output stays between 3.20 and 3.44 V. At 500 mA on a 45 °C day, the calculated junction temperature is
+  116 °C, under the 125 °C recommended maximum, with 194 mm² of copper on the regulator tab.
+
+  The board measures 17 by 28 mm. Assignments are reviewed as design files, so it has not been manufactured. The
+  3D model is built from my Gerbers and the Altium STEP export.
 links:
-- label: Repository
+- label: github.com/Quaot/2-layer-PCB-LDO
   url: https://github.com/Quaot/2-layer-PCB-LDO
 media:
 - type: glb
   src: media/pcb-ldo/board.glb
   alt: Interactive 3D model of the assembled regulator board
-  caption: The board as modelled from my Gerbers and Altium STEP export. Drag to rotate.
 - type: image
-  src: media/pcb-ldo/process/window.svg
-  wide: true
-  alt: Chart of the worst-case output voltage window, 3.20 to 3.44 V, around the 3.3 V target
-  caption: The worst-case output voltage.
+  src: media/pcb-ldo/render.png
+  alt: 3D render of the regulator board from Altium
 - type: image
   src: media/pcb-ldo/schematic.png
   alt: Altium schematic of the LM1117 regulator circuit, with input and output connectors, divider resistors, capacitors
     and a power LED
-  caption: The schematic, exported from Altium.
+- type: image
+  src: media/pcb-ldo/process/window.svg
+  alt: Chart of the worst-case output voltage window, 3.20 to 3.44 V, around the 3.3 V target
 - type: image
   src: media/pcb-ldo/process/thermal.svg
-  wide: true
   alt: Junction temperature of 116 °C at 45 °C ambient, 9 °C under the 125 °C limit
-  caption: The calculated junction temperature at 500 mA, with 194 mm² of copper on the regulator tab.
 - type: image
   src: media/pcb-ldo/layout.png
   alt: PCB layout of the regulator board, labelled JUSTIN LDO V1
-  caption: The PCB layout.
 - type: image
   src: media/pcb-ldo/process/layers.png
   dark: true
   alt: The board separated into its fabrication layers, bottom copper, board, top copper, solder mask and silkscreen
-  caption: The board separated into five of its fabrication layers, from the Gerbers.
-- type: image
-  src: media/pcb-ldo/render.png
-  alt: 3D render of the regulator board from Altium
-  caption: The 3D render from Altium.

@@ -1,23 +1,27 @@
 title: IB Paper Organizer
-subtitle: Searchable library for past exam papers
-role: Personal project
-when: 2024 to 2026
-status: Released (v2.1.2)
-summary: A folder of several hundred IB past papers becomes a searchable library in IB Paper Organizer, a Windows
-  app. Each filename is read into subject, year, session, timezone, level and paper number, and every paper is paired
-  with its mark scheme. It started as a single HTML page and has been maintained since 2024.
-points:
-- Papers are filtered by what they are, not by reading filenames.
-- Papers open in the system's PDF reader, and a copy can be saved elsewhere.
-stack:
-- Electron
-- JavaScript
+category: Desktop App
+summary: |
+  IB Paper Organizer turns a folder of several hundred IB past papers into a searchable library. Each filename is
+  read into subject, year, session, timezone, level and paper number, and every paper is paired with its mark
+  scheme on the same row.
+
+  Papers are filtered by what they are, not by reading filenames. A paper or its mark scheme opens in a preview
+  pane inside the app, which can go fullscreen or save a copy elsewhere. The exam page in the last picture is
+  blurred because IB papers are under copyright.
+
+  It started as a single HTML page in 2024 and has been maintained since, now at version 2.1.2.
 links:
-- label: Repository
+- label: github.com/Quaot/ib-paper-organizer
   url: https://github.com/Quaot/ib-paper-organizer
 cover:
-  poster:
-    bg: '#0d5ea8'
-    fg: '#ffffff'
-    logo: media/ib-paper-organizer/logo.png
-media: []
+  src: media/ib-paper-organizer/screens/library.jpg
+media:
+- type: image
+  src: media/ib-paper-organizer/screens/library.jpg
+  alt: The IB Paper Organizer library, a list of past papers with filters for subject, year, session and level
+- type: image
+  src: media/ib-paper-organizer/screens/search.jpg
+  alt: The library filtered by a search for physics 2024
+- type: image
+  src: media/ib-paper-organizer/screens/viewer.jpg
+  alt: A paper open in the app's preview pane, with the exam page blurred

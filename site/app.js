@@ -1,5 +1,6 @@
 // Fills the page from data.json, which scripts/build.py writes from data/.
 // Three views, picked by the URL hash: #/ (project grid), #/p/<id> (one project), #/profile.
+// The layout follows mashcreative.co.uk: pictures first, then a title beside a short description.
 (function () {
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -27,28 +28,40 @@
     return v;
   }
 
-  // ---- project grid -------------------------------------------------------------
-  function tile(p, label) {
+  // Every project in one list, in the order set by site.yaml (home grid, previous/next, thumbnails).
+  function projects(d) {
+    const all = d.categories.flatMap((c) => c.projects.map((p) => ({ ...p, category: p.category || c.title })));
+    const rank = (p) => { const k = (d.order || []).indexOf(p.id); return k < 0 ? 1e3 : k; };
+    return all.map((p, k) => [p, k]).sort((x, y) => rank(x[0]) - rank(y[0]) || x[1] - y[1]).map(([p]) => p);
+  }
+
+  // The picture that stands for a project: its cover, else its first image or 3D model.
+  function coverOf(p, still) {
     const c = p.cover || {};
     const m = (p.media || [])[0];
-    let cover;
-    if (c.poster) {
-      cover = h('div', { class: 'cover poster', style: `background:${c.poster.bg};color:${c.poster.fg}` },
-        c.poster.logo ? h('img', { class: 'logo', src: c.poster.logo, alt: '' }) : null,
-        h('span', { class: 'poster-title' }, p.title));
-    } else if (c.src) {
-      cover = h('div', { class: 'cover' + (c.fit === 'cover' ? ' bleed' : '') }, h('img', { src: c.src, alt: '' }));
-    } else if (m && is3D(m)) {
-      cover = h('div', { class: 'cover' }, viewer(m, 'still'));
-    } else if (m) {
-      cover = h('div', { class: 'cover' + (m.dark ? ' dark' : '') }, h('img', { src: m.src, alt: m.alt || '' }));
-    } else {
-      cover = h('div', { class: 'cover poster' }, h('span', { class: 'poster-title' }, p.title));
-    }
-    return h('a', { class: 'tile', href: `#/p/${p.id}` }, cover,
+    if (c.src) return h('div', { class: 'cover' }, h('img', { src: c.src, alt: '' }));
+    if (m && is3D(m)) return h('div', { class: 'cover model' }, viewer(m, 'still'));
+    if (m) return h('div', { class: 'cover' + (m.dark ? ' dark' : '') }, h('img', { src: m.src, alt: '' }));
+    return h('div', { class: 'cover model' });
+  }
+
+  // ---- project grid: two masonry columns, title and category on hover -------------
+  function tile(p, k) {
+    return h('a', { class: 'tile', href: `#/p/${p.id}`, style: `order:${k}` }, coverOf(p),
       h('div', { class: 'tile-text' },
         h('span', { class: 'tile-title' }, p.title),
-        h('span', { class: 'muted' }, label)));
+        h('span', { class: 'tile-cat' }, p.category)));
+  }
+
+  function masonry(list) {
+    const cols = [h('div', { class: 'col' }), h('div', { class: 'col' })];
+    const height = [0, 0];
+    list.forEach((p, n) => {
+      const k = height[0] <= height[1] ? 0 : 1;
+      cols[k].append(tile(p, n));
+      height[k] += 1 / (p.cover_aspect || 4 / 3);
+    });
+    return h('div', { class: 'masonry' }, cols);
   }
 
   function gridView(d) {
@@ -57,78 +70,56 @@
         h('p', { class: 'big' }, d.tagline || ''),
         d.intro ? h('p', { class: 'big muted' }, d.intro) : null),
       d.hero_layers ? h('figure', { class: 'hero' },
-        h('div', { class: 'hero-stage' }, viewer({ src: d.hero_layers.src, type: 'layers' })),
-        h('figcaption', { class: 'muted small' }, d.hero_layers.caption || '')) : null,
-      d.categories.map((c) => h('section', { class: 'group', id: c.id },
-        h('h2', { class: 'group-title' }, c.title),
-        h('div', { class: 'grid' }, c.projects.map((p) => tile(p, p.subtitle || c.title))))));
+        h('div', { class: 'hero-stage' }, viewer({ src: d.hero_layers.src, type: 'layers' }))) : null,
+      masonry(projects(d)));
   }
 
-  // ---- one project: text first, then every picture stacked one after another ----
-  function frameFor(m, first) {
-    if (is3D(m)) return h('div', { class: 'plate model' }, viewer(m));
-    // The first picture shows immediately; a lazy portrait image has no size yet and would never load.
-    const img = h('img', { src: m.src, alt: m.alt || '', loading: first || m.portrait ? 'eager' : 'lazy' });
-    // Small images (CAD previews, icons) sit on a plate instead of being blown up.
-    img.addEventListener('load', () => {
-      if (img.naturalWidth && img.naturalWidth < 900 && !m.src.endsWith('.svg')) {
-        img.style.maxWidth = `${Math.round(img.naturalWidth * 1.6)}px`;
-        img.parentElement.classList.add('small');
-      }
-    });
-    return h('div', { class: 'plate' + (m.dark ? ' dark' : '') + (m.portrait ? ' portrait' : '') + (m.src.endsWith('.svg') && !m.wide ? ' drawing' : '') }, img);
+  // ---- one project: pictures first, then title and description, then the rest ---
+  function shot(m, first) {
+    if (is3D(m)) {
+      return h('div', { class: 'shot model' }, viewer(m), h('span', { class: 'hint' }, 'Drag to rotate'));
+    }
+    return h('div', { class: 'shot' + (m.dark ? ' dark' : '') + (m.fit ? ' ' + m.fit : '') },
+      h('img', { src: m.src, alt: m.alt || '', loading: first ? 'eager' : 'lazy' }));
   }
+
+  function textBlock(title, paragraphs, links) {
+    return h('section', { class: 'about' },
+      h('h1', {}, title),
+      h('div', { class: 'desc' },
+        paragraphs.map((t) => h('p', {}, t)),
+        links && links.length ? h('p', { class: 'plain-links' }, linkList(links)) : null));
+  }
+
+  const paras = (t) => (t || '').split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean);
 
   function projectView(d, id) {
-    const all = d.categories.flatMap((c) => c.projects.map((p) => ({ p, c })));
-    const i = all.findIndex((x) => x.p.id === id);
+    const all = projects(d);
+    const i = all.findIndex((p) => p.id === id);
     if (i < 0) return null;
-    const { p, c } = all[i];
-    const next = all[(i + 1) % all.length].p;
-    const prev = all[(i - 1 + all.length) % all.length].p;
-    const facts = [['When', p.when], ['Role', p.role], ['Status', p.status]].filter(([, v]) => v);
-    const media = p.media || [];
+    const p = all[i];
+    const next = all[(i + 1) % all.length];
+    const prev = all[(i - 1 + all.length) % all.length];
     return h('article', { class: 'page project' },
-      h('header', { class: 'project-head' },
-        h('p', { class: 'muted' }, c.title),
-        h('h1', {}, p.title),
-        p.subtitle ? h('p', { class: 'big muted' }, p.subtitle) : null),
-      h('div', { class: 'project-body' },
-        h('div', { class: 'prose' }, h('p', { class: 'summary' }, p.summary)),
-        h('dl', { class: 'facts' },
-          facts.map(([k, v]) => [h('dt', { class: 'muted' }, k), h('dd', {}, v)]),
-          p.stack && p.stack.length ? [h('dt', { class: 'muted' }, 'Tools'), h('dd', {}, p.stack.join(', '))] : null,
-          p.links && p.links.length ? [h('dt', { class: 'muted' }, 'Links'), h('dd', { class: 'links' }, linkList(p.links))] : null)),
-      media.length ? h('div', { class: 'stack' }, media.map((m, k) =>
-        h('figure', { class: 'stack-item' }, frameFor(m, k === 0),
-          h('figcaption', {},
-            h('span', { class: 'num muted' }, String(k + 1).padStart(2, '0')),
-            h('span', {}, m.caption || ''))))) : null,
-      p.points && p.points.length ? h('section', { class: 'notes' },
-        h('h2', { class: 'sub' }, 'Notes'),
-        h('ul', {}, p.points.map((t) => h('li', {}, t)))) : null,
+      h('div', { class: 'stack' }, (p.media || []).map((m, k) => shot(m, k === 0))),
+      textBlock(p.title, paras(p.summary), p.links),
       h('nav', { class: 'next' },
-        h('a', { href: `#/p/${prev.id}` }, 'Previous project'),
-        h('a', { href: `#/p/${next.id}` }, 'Next project')),
+        h('a', { href: `#/p/${prev.id}` }, 'Previous Project'),
+        h('a', { href: `#/p/${next.id}` }, 'Next Project')),
       h('section', { class: 'more' },
-        h('h2', { class: 'sub' }, 'More selected projects'),
-        h('ul', {}, all.filter((x) => x.p.id !== p.id).map((x) => h('li', {},
-          h('a', { href: `#/p/${x.p.id}` }, h('span', { class: 'more-title' }, x.p.title),
-            h('span', { class: 'muted' }, x.c.title)))))));
+        h('h2', {}, 'More selected projects'),
+        h('div', { class: 'thumbs' }, all.filter((x) => x.id !== p.id).map((x) =>
+          h('a', { class: 'thumb', href: `#/p/${x.id}` }, coverOf(x),
+            h('span', { class: 'thumb-title' }, x.title),
+            h('span', { class: 'thumb-cat' }, x.category))))));
   }
 
   // ---- profile ------------------------------------------------------------------
   function profileView(d) {
     const hm = d.hero_model;
     return h('div', { class: 'page profile' },
-      h('header', { class: 'project-head' }, h('h1', {}, 'A bit more about me')),
-      h('div', { class: 'project-body' },
-        h('div', { class: 'prose' }, (d.about || '').split(/\n\s*\n/).map((t) => h('p', {}, t))),
-        h('dl', { class: 'facts' },
-          h('dt', { class: 'muted' }, 'Elsewhere'), h('dd', { class: 'links' }, linkList(d.links)))),
-      hm && hm.src ? h('div', { class: 'stack' }, h('figure', { class: 'stack-item' },
-        h('div', { class: 'plate model' }, viewer({ src: hm.src, type: 'stl' })),
-        h('figcaption', {}, h('span', {}, hm.caption || '')))) : null);
+      hm && hm.src ? h('div', { class: 'stack' }, shot({ src: hm.src, type: 'stl' }, true)) : null,
+      textBlock('A bit more about me...', paras(d.about)));
   }
 
   // ---- routing ------------------------------------------------------------------
@@ -149,7 +140,9 @@
   fetch('data.json', { cache: 'no-cache' }).then((r) => r.json()).then((d) => {
     data = d;
     $$('[data-name]').forEach((el) => { el.textContent = d.name; });
-    $$('[data-links]').forEach((el) => el.replaceChildren(...linkList(d.links)));
+    const mail = (d.links || []).filter((l) => l.url.startsWith('mailto:'));
+    $$('[data-links]').forEach((el) => el.replaceChildren(...linkList((d.links || []).filter((l) => !mail.includes(l)))));
+    $$('[data-email]').forEach((el) => el.replaceChildren(...mail.map((l) => h('a', { href: l.url }, l.url.slice(7)))));
     window.addEventListener('hashchange', render);
     render();
   }).catch(() => {

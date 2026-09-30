@@ -1,47 +1,35 @@
-title: Bakfiets F26
-subtitle: Electrium Mobility electric cargo bike
-role: Project lead
-when: Fall 2026
-status: In progress
-summary: Bakfiets is Electrium Mobility's electric cargo bike, and this term I lead the 25-person team finishing
-  it, one of several projects in a club of about 70 members. The 2024 team designed the frame and cargo box and
-  started the build. To help new members get going, I gathered the 2024 and 2025 files into one repository, wrote
-  an onboarding guide and 30 GitHub issues, and drew the diagrams the team plans its work from.
-points:
-- The CAD, firmware and wiring files were recovered from old branches, with a record of where each one came from.
-- Each GitHub issue lists its steps, dependencies and safety notes, across all three subteams.
-- The planning diagrams cover the power flow, the 12S3P battery pack and the motor controller wiring.
-stack:
-- GitHub
-- Python
-- SolidWorks
-- KiCad
-- ESP32-S3
-- VESC
+title: Bakfiets
+category: Team Leadership
+summary: |
+  Bakfiets is Electrium Mobility's electric cargo bike. This term I lead the 25-person team finishing it, one of
+  several projects in a club of about 70 members.
+
+  The bike was designed by the 2024 team in SolidWorks, and the pictures here are their model: a normal back half
+  joined to a long, low frame that carries a wooden cargo box in front of the rider. The third picture sets the
+  2024 assembly beside the rebuild the 2025 co-op students started.
+
+  My work so far has been getting a new team going. I gathered the 2024 and 2025 files from old branches into one
+  repository, wrote an onboarding guide and 30 GitHub issues across the mechanical, electrical and firmware
+  subteams, and drew the diagrams the team plans its work from: the labelled bike, the onboarding path and the
+  power flow from the battery through the motor controller.
 links:
-- label: Repository
+- label: github.com/Electrium-Mobility/Bakfiets-F26
   url: https://github.com/Electrium-Mobility/Bakfiets-F26
+cover:
+  src: media/bakfiets/bike-render.jpg
 media:
 - type: image
-  src: media/bakfiets/frame-and-box.png
-  alt: SolidWorks assembly of the bakfiets frame with the wooden cargo box mounted in front
-  caption: The frame and cargo box, designed by the 2024 team in SolidWorks.
+  src: media/bakfiets/bike-render.jpg
+  alt: SolidWorks render of the full bakfiets, a green cargo bike with a wooden box between the seat and the front wheel
 - type: image
-  src: media/bakfiets/process/jig.png
-  alt: The welding jig, a board with brackets holding each frame tube in position
-  caption: The welding jig from the 2024 build, which holds each frame tube in position.
-- type: stl
-  src: media/bakfiets/notching-guide.stl
-  caption: A printable guide for notching the tube ends before welding. Drag to rotate.
+  src: media/bakfiets/bike-labelled.jpg
+  alt: The same render with each part labelled, and a list of the parts not yet in the model
 - type: image
-  src: media/bakfiets/process/cargo-box.png
-  alt: SolidWorks model of a curved cargo box on the frame
-  caption: A second cargo box design from the same files.
+  src: media/bakfiets/assemblies.jpg
+  alt: Two SolidWorks assemblies of the full bike, the 2024 model on the left and the 2025 co-op rebuild on the right
 - type: image
-  src: media/bakfiets/onboarding-path.png
+  src: media/bakfiets/onboarding-path.jpg
   alt: Onboarding path diagram, from setup through each subteam's stages to the term projects
-  caption: The onboarding path for new members, from setup to their first project.
 - type: image
-  src: media/bakfiets/power-flow.png
+  src: media/bakfiets/power-flow.jpg
   alt: Power flow diagram of the bike, from charger and battery through the motor controller to the electronics
-  caption: The power flow through the bike, drawn to plan the electrical work.
