@@ -21,7 +21,7 @@ site/                    the page itself: plain HTML, CSS and JavaScript
 3. Build and preview:
 
    ```
-   pip install pyyaml
+   pip install pyyaml pillow
    python scripts/build.py --serve
    ```
 
