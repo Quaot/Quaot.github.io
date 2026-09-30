@@ -1,8 +1,8 @@
 # Everything about you that isn't a project. Edit this, then run: python scripts/build.py
 name: Justin Gu
-tagline: This portfolio site shows the work of Justin Gu, Electrical Engineering student at the University of Waterloo
-  and project lead of Bakfiets at Electrium Mobility.
-intro: Circuit boards, 3D printed parts and software, shown with the calculations and test pieces behind them.
+tagline: This portfolio site shows the work of Justin Gu, *Electrical Engineering* student at the University of Waterloo
+  and project lead of *Bakfiets* at Electrium Mobility.
+intro: Circuit boards, 3D printed parts and software, shown with the *calculations* and *test pieces* behind them.
 hero_layers:
   src: media/pcb-ldo/layers.glb
   caption: The 3.3 V regulator board, separated into five of its fabrication layers.

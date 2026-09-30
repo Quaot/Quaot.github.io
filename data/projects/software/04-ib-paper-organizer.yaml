@@ -1,5 +1,6 @@
 title: IB Paper Organizer
 category: Desktop App
+color: '#1f4fa3'
 summary: |
   IB Paper Organizer turns a folder of several hundred IB past papers into a searchable library. Each filename is
   read into subject, year, session, timezone, level and paper number, and every paper is paired with its mark

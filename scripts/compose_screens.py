@@ -12,6 +12,8 @@ from PIL import Image, ImageDraw, ImageFilter
 ROOT = Path(__file__).resolve().parent.parent
 W, H = 1880, 1253          # 3:2
 BG = (242, 242, 242)
+# Each app sits on its project colour (the same hex as `color` in its data file).
+COLOR = {'ironlog': '#cfe84a', 'ib-paper-organizer': '#1f4fa3', 'youtonomous': '#c8323c', 'ai-phillic': '#c8643b'}
 
 
 def rounded(im, r):
@@ -41,8 +43,8 @@ def place(plate, im, box, r):
     plate.alpha_composite(rounded(im, r), (px, py))
 
 
-def plate_of(images, r, margin=110, gap=60):
-    plate = Image.new('RGBA', (W, H), BG + (255,))
+def plate_of(images, r, margin=110, gap=60, bg=BG):
+    plate = Image.new('RGBA', (W, H), bg)
     n = len(images)
     bw = (W - 2 * margin - gap * (n - 1)) // n
     for i, im in enumerate(images):
@@ -61,8 +63,8 @@ def main(shots):
     s = lambda n: Image.open(shots / n).convert('RGB')
 
     # IronLog: phone screens at 1170x2532.
-    save(plate_of([s('il-today.png'), s('il-workout.png'), s('il-progress.png')], r=90), 'ironlog/screens/overview.jpg')
-    save(plate_of([s('il-workout.png'), s('il-history.png')], r=90), 'ironlog/screens/workout-history.jpg')
+    save(plate_of([s('il-today.png'), s('il-workout.png'), s('il-progress.png')], r=90, bg=COLOR['ironlog']), 'ironlog/screens/overview.jpg')
+    save(plate_of([s('il-workout.png'), s('il-history.png')], r=90, bg=COLOR['ironlog']), 'ironlog/screens/workout-history.jpg')
 
     # IB Paper Organizer: window captures, trimmed to the app's content area.
     lib = s('ibo-library.png')
@@ -72,10 +74,16 @@ def main(shots):
     page = (946 - 11, 348 - 84, 1752 - 11, 1020 - 84)
     viewer.paste(viewer.crop(page).filter(ImageFilter.GaussianBlur(9)), page[:2])
     for name, im in (('library', lib), ('search', search), ('viewer', viewer)):
-        save(plate_of([im], r=18, margin=90), f'ib-paper-organizer/screens/{name}.jpg')
+        save(plate_of([im], r=18, margin=90, bg=COLOR['ib-paper-organizer']), f'ib-paper-organizer/screens/{name}.jpg')
 
     # Youtonomous: native window, 1290x688.
-    save(plate_of([s('yt-main-crop.png')], r=10, margin=90), 'youtonomous/screens/player.jpg')
+    # AI-Phillic: Expo web build at 390x844, 3x, onboarded as a sample student.
+    ai = COLOR['ai-phillic']
+    save(plate_of([s('aip-journey-top.png'), s('aip-lesson2.png'), s('aip-quiz.png')], r=90, bg=ai), 'ai-phillic/screens/lesson.jpg')
+    save(plate_of([s('aip-lesson3.png'), s('aip-lesson4.png'), s('aip-scan.png')], r=90, bg=ai), 'ai-phillic/screens/teaching.jpg')
+    save(plate_of([s('aip-progress.png'), s('aip-journey.png'), s('aip-onboarding.png')], r=90, bg=ai), 'ai-phillic/screens/progress.jpg')
+
+    save(plate_of([s('yt-main-crop.png')], r=10, margin=90, bg=COLOR['youtonomous']), 'youtonomous/screens/player.jpg')
 
 
 if __name__ == '__main__':

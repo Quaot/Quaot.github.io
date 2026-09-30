@@ -1,5 +1,6 @@
 title: IronLog
 category: App Design
+color: '#cfe84a'
 summary: |
   IronLog is an offline gym tracker for iPhone and the web. Weight and reps are set on scrolling sliders designed
   for one hand, and each set is filled in ahead of time with a suggested weight and the plates to load.

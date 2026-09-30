@@ -1,5 +1,6 @@
 title: 3.3 V regulator board
 category: PCB Design
+color: '#1e6b4f'
 summary: |
   A two-layer board that takes 5 V in and gives 3.3 V out, built around the LM1117. It is my admission assignment
   for WATonomous's Humanoid Electrical team.

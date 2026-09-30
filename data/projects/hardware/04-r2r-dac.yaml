@@ -1,5 +1,6 @@
 title: R-2R DAC
 category: Electronics
+color: '#e0a526'
 summary: |
   A 4-bit digital-to-analogue converter made only from 10k and 20k resistors.
 

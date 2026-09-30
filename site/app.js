@@ -1,6 +1,7 @@
 // Fills the page from data.json, which scripts/build.py writes from data/.
 // Three views, picked by the URL hash: #/ (project grid), #/p/<id> (one project), #/profile.
-// The layout follows mashcreative.co.uk: pictures first, then a title beside a short description.
+// Pictures come first and a title sits beside a short description, after mashcreative.co.uk.
+// Every project carries its own colour (`color` in its data file), used for its overlay, numbers and plates.
 (function () {
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -20,6 +21,18 @@
     }, l.label));
   }
 
+  // *words* in the data become italic serif emphasis.
+  const rich = (t) => (t || '').split(/(\*[^*]+\*)/).map((s) => (s.startsWith('*') ? h('em', {}, s.slice(1, -1)) : s));
+
+  // Ink or paper, whichever reads better on a project's colour.
+  function onColor(hex) {
+    const n = parseInt((hex || '#000').slice(1), 16);
+    const lum = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+    return lum > 0.6 ? '#17150f' : '#f6f0e4';
+  }
+  const paint = (p) => `--c:${p.color || '#17150f'};--on:${onColor(p.color)}`;
+  const num = (k) => String(k + 1).padStart(2, '0');
+
   const is3D = (m) => m.type === 'stl' || m.type === 'glb';
 
   function viewer(m, cls) {
@@ -32,11 +45,11 @@
   function projects(d) {
     const all = d.categories.flatMap((c) => c.projects.map((p) => ({ ...p, category: p.category || c.title })));
     const rank = (p) => { const k = (d.order || []).indexOf(p.id); return k < 0 ? 1e3 : k; };
-    return all.map((p, k) => [p, k]).sort((x, y) => rank(x[0]) - rank(y[0]) || x[1] - y[1]).map(([p]) => p);
+    return all.map((p, k) => [p, k]).sort((x, y) => rank(x[0]) - rank(y[0]) || x[1] - y[1]).map(([p], n) => ({ ...p, n }));
   }
 
   // The picture that stands for a project: its cover, else its first image or 3D model.
-  function coverOf(p, still) {
+  function coverOf(p) {
     const c = p.cover || {};
     const m = (p.media || [])[0];
     if (c.src) return h('div', { class: 'cover' }, h('img', { src: c.src, alt: '' }));
@@ -45,9 +58,10 @@
     return h('div', { class: 'cover model' });
   }
 
-  // ---- project grid: two masonry columns, title and category on hover -------------
-  function tile(p, k) {
-    return h('a', { class: 'tile', href: `#/p/${p.id}`, style: `order:${k}` }, coverOf(p),
+  // ---- home: the statement, a colour index, the layer stack, then two masonry columns -------
+  function tile(p) {
+    return h('a', { class: 'tile', href: `#/p/${p.id}`, style: `order:${p.n};${paint(p)}` }, coverOf(p),
+      h('span', { class: 'tile-num' }, num(p.n)),
       h('div', { class: 'tile-text' },
         h('span', { class: 'tile-title' }, p.title),
         h('span', { class: 'tile-cat' }, p.category)));
@@ -56,25 +70,36 @@
   function masonry(list) {
     const cols = [h('div', { class: 'col' }), h('div', { class: 'col' })];
     const height = [0, 0];
-    list.forEach((p, n) => {
+    list.forEach((p) => {
       const k = height[0] <= height[1] ? 0 : 1;
-      cols[k].append(tile(p, n));
+      cols[k].append(tile(p));
       height[k] += 1 / (p.cover_aspect || 4 / 3);
     });
     return h('div', { class: 'masonry' }, cols);
   }
 
-  function gridView(d) {
-    return h('div', { class: 'page' },
-      h('section', { class: 'lede' },
-        h('p', { class: 'big' }, d.tagline || ''),
-        d.intro ? h('p', { class: 'big muted' }, d.intro) : null),
-      d.hero_layers ? h('figure', { class: 'hero' },
-        h('div', { class: 'hero-stage' }, viewer({ src: d.hero_layers.src, type: 'layers' }))) : null,
-      masonry(projects(d)));
+  function palette(list) {
+    return h('nav', { class: 'palette', 'aria-label': 'Projects by colour' }, list.map((p) =>
+      h('a', { class: 'swatch', href: `#/p/${p.id}`, style: paint(p) },
+        h('span', { class: 'swatch-num' }, num(p.n)),
+        h('span', { class: 'swatch-title' }, p.title))));
   }
 
-  // ---- one project: pictures first, then title and description, then the rest ---
+  function gridView(d) {
+    const list = projects(d);
+    return h('div', { class: 'page home' },
+      h('section', { class: 'lede' },
+        h('p', { class: 'statement' }, rich(d.tagline)),
+        d.intro ? h('p', { class: 'intro' }, rich(d.intro)) : null),
+      palette(list),
+      d.hero_layers ? h('figure', { class: 'hero' },
+        h('div', { class: 'hero-stage' }, viewer({ src: d.hero_layers.src, type: 'layers' })),
+        h('figcaption', {}, h('span', { class: 'num-inline' }, '↑'), d.hero_layers.caption || '')) : null,
+      h('h2', { class: 'section-mark' }, h('em', {}, 'Selected'), ' work'),
+      masonry(list));
+  }
+
+  // ---- one project: pictures first, then title and description, then the rest ---------------
   function shot(m, first) {
     if (is3D(m)) {
       return h('div', { class: 'shot model' }, viewer(m), h('span', { class: 'hint' }, 'Drag to rotate'));
@@ -83,11 +108,11 @@
       h('img', { src: m.src, alt: m.alt || '', loading: first ? 'eager' : 'lazy' }));
   }
 
-  function textBlock(title, paragraphs, links) {
+  function textBlock(head, paragraphs, links) {
     return h('section', { class: 'about' },
-      h('h1', {}, title),
+      h('header', { class: 'about-head' }, head),
       h('div', { class: 'desc' },
-        paragraphs.map((t) => h('p', {}, t)),
+        paragraphs.map((t, k) => h('p', { class: k === 0 ? 'first' : null }, rich(t))),
         links && links.length ? h('p', { class: 'plain-links' }, linkList(links)) : null));
   }
 
@@ -100,29 +125,33 @@
     const p = all[i];
     const next = all[(i + 1) % all.length];
     const prev = all[(i - 1 + all.length) % all.length];
-    return h('article', { class: 'page project' },
+    const step = (x, label) => h('a', { href: `#/p/${x.id}`, style: paint(x) },
+      h('span', { class: 'step-label' }, label), h('span', { class: 'step-title' }, x.title));
+    return h('article', { class: 'page project', style: paint(p) },
       h('div', { class: 'stack' }, (p.media || []).map((m, k) => shot(m, k === 0))),
-      textBlock(p.title, paras(p.summary), p.links),
-      h('nav', { class: 'next' },
-        h('a', { href: `#/p/${prev.id}` }, 'Previous Project'),
-        h('a', { href: `#/p/${next.id}` }, 'Next Project')),
+      textBlock([
+        h('span', { class: 'big-num' }, num(p.n)),
+        h('h1', {}, p.title),
+        h('span', { class: 'cat' }, p.category),
+      ], paras(p.summary), p.links),
+      h('nav', { class: 'next' }, step(prev, 'Previous Project'), step(next, 'Next Project')),
       h('section', { class: 'more' },
-        h('h2', {}, 'More selected projects'),
+        h('h2', {}, h('em', {}, 'More'), ' selected projects'),
         h('div', { class: 'thumbs' }, all.filter((x) => x.id !== p.id).map((x) =>
-          h('a', { class: 'thumb', href: `#/p/${x.id}` }, coverOf(x),
+          h('a', { class: 'thumb', href: `#/p/${x.id}`, style: paint(x) }, coverOf(x),
             h('span', { class: 'thumb-title' }, x.title),
             h('span', { class: 'thumb-cat' }, x.category))))));
   }
 
-  // ---- profile ------------------------------------------------------------------
+  // ---- profile ------------------------------------------------------------------------------
   function profileView(d) {
     const hm = d.hero_model;
-    return h('div', { class: 'page profile' },
+    return h('div', { class: 'page profile', style: '--c:#e4572e;--on:#f6f0e4' },
       hm && hm.src ? h('div', { class: 'stack' }, shot({ src: hm.src, type: 'stl' }, true)) : null,
-      textBlock('A bit more about me...', paras(d.about)));
+      textBlock([h('h1', {}, 'A bit more ', h('em', {}, 'about me'), '...')], paras(d.about)));
   }
 
-  // ---- routing ------------------------------------------------------------------
+  // ---- routing ------------------------------------------------------------------------------
   let data;
   function render() {
     const hash = location.hash.replace(/^#\/?/, '');

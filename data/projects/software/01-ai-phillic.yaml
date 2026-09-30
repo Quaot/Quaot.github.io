@@ -1,5 +1,6 @@
 title: AI-Phillic
 category: App Design
+color: '#c8643b'
 summary: |
   AI-Phillic was our entry to IDEA-X 2026, a school district challenge on AI and critical thinking, made by four
   grade 12 students. My part was the app, and the rest of the team prepared the presentation. Of the 20 teams that
@@ -8,6 +9,8 @@ summary: |
   The app teaches students to check what they read online. Each lesson is a short illustrated story, and students
   tap the claims they think were made up. A separate service splits a claim into single statements, searches the
   web and scholarly sources, and marks each source as supporting, contradicting or neutral.
+
+  The screens here are the app running on my computer, signed in as a sample student.
 links:
 - label: github.com/Quaot/ai-phillic
   url: https://github.com/Quaot/ai-phillic
@@ -16,6 +19,16 @@ links:
 cover:
   src: media/ai-phillic/award-cover.jpg
 media:
+- type: image
+  src: media/ai-phillic/screens/lesson.jpg
+  alt: Three AI-Phillic screens, the river map of lessons, an illustrated story page and a quiz that rebuilds the lesson's
+    key sentence from tiles
+- type: image
+  src: media/ai-phillic/screens/teaching.jpg
+  alt: Three AI-Phillic screens, a teaching page on strong and weak evidence, a reflection prompt and the source scanner
+- type: image
+  src: media/ai-phillic/screens/progress.jpg
+  alt: Three AI-Phillic screens, progress by topic, the lesson cards along the river and the welcome screen
 - type: image
   src: media/ai-phillic/award.jpg
   alt: The glass IDEA-X Outstanding Solution award from Langley Schools, held in one hand

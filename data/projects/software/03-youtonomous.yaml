@@ -1,5 +1,6 @@
 title: Youtonomous
 category: Desktop App
+color: '#c8323c'
 summary: |
   Youtonomous is a small Windows app for YouTube videos watched more than once. It downloads the video, remembers
   where the content starts, and opens it there every time.
