@@ -17,7 +17,7 @@
 
   function linkList(links) {
     return (links || []).map((l) => h('a', {
-      href: l.url, ...(l.url.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {}),
+      href: l.url, ...(/^http|\.pdf$/.test(l.url) ? { target: '_blank', rel: 'noopener' } : {}),
     }, l.label));
   }
 
@@ -148,7 +148,26 @@
     const hm = d.hero_model;
     return h('div', { class: 'page profile', style: '--c:#e4572e;--on:#f6f0e4' },
       hm && hm.src ? h('div', { class: 'stack' }, shot({ src: hm.src, type: 'stl' }, true)) : null,
-      textBlock([h('h1', {}, 'A bit more ', h('em', {}, 'about me'), '...')], paras(d.about)));
+      textBlock([h('h1', {}, 'A bit more ', h('em', {}, 'about me'), '...')], paras(d.about),
+        [{ label: 'Résumé (PDF)', url: 'media/resume.pdf' }]),
+      d.now && d.now.items ? h('section', { class: 'now' },
+        h('h2', {}, h('em', {}, 'Now'), h('span', { class: 'now-when' }, d.now.when || '')),
+        h('ol', {}, d.now.items.map((t) => h('li', {}, rich(t))))) : null);
+  }
+
+  // ---- motion: pictures and text rise in as they scroll into view ---------------------------
+  const reveal = 'IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches
+    ? new IntersectionObserver((entries) => entries.forEach((e) => {
+      if (e.isIntersecting) { e.target.classList.add('in'); reveal.unobserve(e.target); }
+    }), { rootMargin: '0px 0px -8% 0px' })
+    : null;
+  function animate(root) {
+    if (!reveal) return;
+    root.classList.add('motion');
+    $$('.shot, .tile, .about, .swatch, .next, .thumb, .now, .hero', root).forEach((el, k) => {
+      if (el.classList.contains('swatch')) el.style.transitionDelay = `${(k % 12) * 45}ms`;
+      reveal.observe(el);
+    });
   }
 
   // ---- routing ------------------------------------------------------------------------------
@@ -161,6 +180,7 @@
     if (!view) view = gridView(data);
     $$('[data-nav]').forEach((a) => a.classList.toggle('active', a.dataset.nav === nav));
     $('[data-view]').replaceChildren(view);
+    animate(view);
     window.scrollTo(0, 0);
     const title = view.querySelector('h1');
     document.title = title ? `${title.textContent} | ${data.name}` : data.name;

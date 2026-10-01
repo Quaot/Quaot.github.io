@@ -9,6 +9,8 @@ summary: |
   year. All data stays on the phone, with no account required. The screens here show the app's built-in sample
   data.
 links:
+- label: 'Try it: quaot.github.io/ironlog'
+  url: https://quaot.github.io/ironlog/
 - label: github.com/Quaot/ironlog
   url: https://github.com/Quaot/ironlog
 cover:

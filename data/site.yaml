@@ -20,6 +20,13 @@ about: 'I am a first-year Electrical Engineering student at the University of Wa
 
 
   If you would like to discuss a co-op position or any of the projects here, contact me at gujustin1@gmail.com.'
+# A short dated list on the Profile page. Update it each term.
+now:
+  when: Fall 2026
+  items:
+  - Leading the Bakfiets team at Electrium Mobility
+  - Completing the WATonomous Humanoid Electrical admission assignment
+  - Academic representative for my Electrical Engineering class
 links:
 - label: GitHub
   url: https://github.com/Quaot
@@ -33,4 +40,4 @@ categories:
 - id: software
   title: Software
 # Order of the home grid, Previous/Next Project and the thumbnails.
-order: [ldo-board, ai-phillic, bakfiets, r2r-dac, ironlog, rolling-wheel, 3d-printing, ib-paper-organizer, youtonomous]
+order: [ldo-board, ai-phillic, bakfiets, r2r-dac, ironlog, rolling-wheel, 3d-printing, chess-mobility, ib-paper-organizer, youtonomous]

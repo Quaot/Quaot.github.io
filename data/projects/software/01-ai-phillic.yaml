@@ -10,8 +10,11 @@ summary: |
   tap the claims they think were made up. A separate service splits a claim into single statements, searches the
   web and scholarly sources, and marks each source as supporting, contradicting or neutral.
 
-  The screens here are the app running on my computer, signed in as a sample student.
+  The screens here are the app running on my computer, signed in as a sample student. The lessons, quiz and
+  progress can be tried in the browser. The scanner needs its own server, so it is not part of that demo.
 links:
+- label: 'Try the lessons: quaot.github.io/ai-phillic'
+  url: https://quaot.github.io/ai-phillic/
 - label: github.com/Quaot/ai-phillic
   url: https://github.com/Quaot/ai-phillic
 - label: IDEA-X announcement

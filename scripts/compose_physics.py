@@ -42,6 +42,11 @@ def figure(doc, name):
         for r in page.search_for('(240 fps)'):
             page.add_redact_annot(r, fill=(1, 1, 1))
         page.apply_redactions()
+    save(render_plate(page, box), f'{name}.jpg')
+
+
+def render_plate(page, box):
+    """Render a region of a PDF page at 300 dpi, centred on a white 3:2 plate."""
     pix = page.get_pixmap(clip=pymupdf.Rect(*box), dpi=300)
     im = Image.frombytes('RGB', (pix.width, pix.height), pix.samples)
     w, h = im.size
@@ -49,7 +54,7 @@ def figure(doc, name):
     W3, H3 = round(W3 * 1.08), round(H3 * 1.08)          # a little white space around each drawing
     plate = Image.new('RGB', (W3, H3), 'white')
     plate.paste(im, ((W3 - w) // 2, (H3 - h) // 2))
-    save(plate, f'{name}.jpg')
+    return plate
 
 
 def save(im, name):

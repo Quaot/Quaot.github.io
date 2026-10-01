@@ -1,0 +1,43 @@
+title: Chess mobility
+category: Math Modelling
+color: '#4ea8de'
+summary: |
+  My IB Math HL exploration asked how much room a chess piece has to move, on average, as the board empties.
+
+  I treated every other piece as placed at random and worked out how far a piece could go from each square before
+  something stopped it. For the rook, bishop and queen that is a probability along each direction, where a friendly
+  piece blocks its square and an enemy piece can be captured. For the knight and king only the destination squares
+  matter. Averaging over all 64 squares gives the expected number of moves for each piece.
+
+  Worked out for a standard board as pieces come off two at a time, the queen always has the most moves and gains
+  them fastest, because clearing one square can open a whole line. The king beats the knight at every stage, since
+  so many of the knight's jumps land off the board. The model leaves out check, pins and the shape of real games,
+  which is its main limit.
+cover:
+  src: media/chess/rook-board.jpg
+media:
+- type: image
+  src: media/chess/rook-board.jpg
+  alt: A rook near the centre of an empty board, with the 14 squares it can reach shaded
+- type: image
+  src: media/chess/rook-blocked.jpg
+  alt: The rook's four directions to the edge of the board, and the same rook stopped by pieces in its way
+- type: image
+  src: media/chess/rook-anywhere.jpg
+  alt: Rooks in a corner, on an edge and in the centre, each reaching the same 14 squares on an empty board
+- type: image
+  src: media/chess/ray-friendly.jpg
+  alt: A rook's path along one line, stopping before the first square held by a friendly piece
+- type: image
+  src: media/chess/ray-enemy.jpg
+  alt: A rook's path along one line, ending by capturing the first enemy piece
+- type: image
+  src: media/chess/knight-edge.jpg
+  alt: A knight near the edge of the board, with several of its moves falling off the board
+- type: image
+  src: media/chess/king-edge.jpg
+  alt: A king near the edge of the board, with all of its moves still on the board
+- type: image
+  src: media/chess/mobility.jpg
+  alt: Graph of expected mobility for king, knight, bishop, rook and queen as the number of pieces falls from 32 to 2,
+    with the queen highest and rising fastest
