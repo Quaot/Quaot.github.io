@@ -15,7 +15,6 @@
     el.appendChild(loading);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     el.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
@@ -88,13 +87,18 @@
       }, undefined, failed);
     }
 
+    // Draw at the screen's own density (3x on most phones) so the model is as sharp as the pictures
+    // around it, but keep each canvas under about 6 million pixels so large viewers stay smooth.
     function resize() {
       const w = el.clientWidth, h = el.clientHeight || w * 0.75;
+      if (!w || !h) return;
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 3, Math.sqrt(6e6 / (w * h))));
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
     }
     new ResizeObserver(resize).observe(el);
+    matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`).addEventListener('change', resize, { once: true });   // moved to another screen
     resize();
 
     let visible = true;
