@@ -85,6 +85,39 @@
         h('span', { class: 'swatch-title' }, p.title))));
   }
 
+  // The home-page board: pinned while you scroll past it, pulling apart into its labelled layers,
+  // with current running along its tracks and your name set behind it.
+  const LAYER_NAMES = [
+    ['silk', 'Silkscreen'], ['mask', 'Solder mask'], ['top-copper', 'Top copper'],
+    ['board', 'Board'], ['bottom-copper', 'Bottom copper'],
+  ];
+  function heroBoard(d) {
+    const hl = d.hero_layers;
+    const labels = {};
+    const labelEls = LAYER_NAMES.map(([key, name]) => (labels[key] = h('span', { class: 'layer-label' }, h('em', {}, name))));
+    const leaders = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    leaders.setAttribute('class', 'hero-leaders');
+    leaders.setAttribute('aria-hidden', 'true');
+    const v = h('div', { class: 'viewer hero-viewer' });
+    const run = h('section', { class: 'hero-run', 'aria-label': hl.caption || 'Circuit board' },
+      h('div', { class: 'hero-pin' },
+        h('div', { class: 'hero-stage' },
+          h('p', { class: 'hero-name', 'aria-hidden': 'true' }, d.name, h('span', {}, '.')),
+          v, leaders, h('div', { class: 'hero-labels', 'aria-hidden': 'true' }, labelEls),
+          h('div', { class: 'hero-readout' },
+            (hl.readout || []).map(([k, val]) => h('span', { class: 'reading' }, h('b', {}, val), ' ', k))),
+          h('p', { class: 'hero-hint' }, hl.hint || 'Scroll to take it apart', h('span', { 'aria-hidden': 'true' }, ' ↓')))),
+      h('p', { class: 'hero-caption' }, hl.caption || ''));
+    // 0 when the pinned stage first fills the screen, 1 when the page has scrolled through its runway.
+    const progress = () => {
+      const r = run.getBoundingClientRect();
+      const travel = run.offsetHeight - innerHeight;
+      return travel > 0 ? -r.top / travel : 0;
+    };
+    window.STLViewer.hero(v, hl.src, { progress, labels, leaders, traces: hl.traces });
+    return run;
+  }
+
   function gridView(d) {
     const list = projects(d);
     return h('div', { class: 'page home' },
@@ -92,9 +125,7 @@
         h('p', { class: 'statement' }, rich(d.tagline)),
         d.intro ? h('p', { class: 'intro' }, rich(d.intro)) : null),
       palette(list),
-      d.hero_layers ? h('figure', { class: 'hero' },
-        h('div', { class: 'hero-stage' }, viewer({ src: d.hero_layers.src, type: 'layers' })),
-        h('figcaption', {}, h('span', { class: 'num-inline' }, '↑'), d.hero_layers.caption || '')) : null,
+      d.hero_layers ? heroBoard(d) : null,
       h('h2', { class: 'section-mark' }, h('em', {}, 'Selected'), ' work'),
       masonry(list));
   }
@@ -193,7 +224,7 @@
   function animate(root) {
     if (!reveal) return;
     root.classList.add('motion');
-    $$('.shot, .tile, .about, .swatch, .next, .thumb, .now, .hero, .fig', root).forEach((el, k) => {
+    $$('.shot, .tile, .about, .swatch, .next, .thumb, .now, .fig', root).forEach((el, k) => {
       if (el.classList.contains('swatch')) el.style.transitionDelay = `${(k % 12) * 45}ms`;
       reveal.observe(el);
     });

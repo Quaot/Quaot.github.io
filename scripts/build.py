@@ -67,6 +67,7 @@ def main():
 
     check_media((site.get("hero_model") or {}).get("src"), "site.yaml hero_model")
     check_media((site.get("hero_layers") or {}).get("src"), "site.yaml hero_layers")
+    check_media((site.get("hero_layers") or {}).get("traces"), "site.yaml hero_layers")
 
     categories = []
     for cat in site.get("categories", []):

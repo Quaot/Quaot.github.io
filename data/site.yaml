@@ -5,7 +5,15 @@ tagline: This portfolio site shows the work of Justin Gu, *Electrical Engineerin
 intro: Circuit boards, 3D printed parts and software, shown with the *calculations* and *test pieces* behind them.
 hero_layers:
   src: media/pcb-ldo/layers.glb
-  caption: The 3.3 V regulator board, separated into five of its fabrication layers.
+  traces: media/pcb-ldo/traces.json   # from scripts/trace_paths.py
+  caption: The 3.3 V regulator board, separated into five of its fabrication layers. The readings are its calculated
+    full-load design values.
+  hint: Scroll to take it apart
+  readout:   # [what it is, value], from the board's README
+  - [in, 5.0 V]
+  - [out, 3.3 V]
+  - [load, 500 mA]
+  - [junction, 116 °C]
 hero_model:
   src: media/printing/enclosure-base.stl
   caption: An enclosure base generated from a KiCad board file. Drag to rotate.
