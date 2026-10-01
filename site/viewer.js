@@ -8,23 +8,6 @@
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
 
-  // A soft round dot, drawn once, for the current pulses.
-  let dot;
-  function dotTexture() {
-    if (dot) return dot;
-    const c = document.createElement('canvas');
-    c.width = c.height = 64;
-    const g = c.getContext('2d');
-    const r = g.createRadialGradient(32, 32, 0, 32, 32, 32);
-    r.addColorStop(0, 'rgba(255,255,255,1)');
-    r.addColorStop(0.25, 'rgba(255,236,170,.9)');
-    r.addColorStop(1, 'rgba(255,190,90,0)');
-    g.fillStyle = r;
-    g.fillRect(0, 0, 64, 64);
-    dot = new THREE.CanvasTexture(c);
-    return dot;
-  }
-
   function mount(el, src, type) {
     if (el._viewer) return;
     const hero = el._hero;   // { progress(), labels: {layer name: element}, leaders: <svg>, traces: url }
@@ -60,46 +43,125 @@
       );
     }
     let layers = [];   // [node, resting height] for type 'layers'
-    let stage = null, size = null, pulses = null;
+    let stage = null, size = null, current = null, heroModel = null;
     const lift = new Map();   // layer -> how far pointing at it has raised it (eased)
     let spread = 0.1, tiltX = 0, tiltY = 0, aimX = 0, aimY = 0, hovered = null;
     const pointer = new THREE.Vector2(9, 9), ray = new THREE.Raycaster();
     const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;   // no drifting current or tilting
+    const pull = new Map();   // layer -> how far it has been dragged out of the stack (model space, mm)
+    let drag = null;
+    const hitPoint = new THREE.Vector3(), zero = new THREE.Vector3();
+    const layerOf = (o) => {
+      for (; o; o = o.parent) {
+        const found = layers.find(([n]) => n === o);
+        if (found) return found[0];
+      }
+      return null;
+    };
 
-    // Current along the tracks: dots that run the length of each top-copper segment.
+    // Current along the tracks. Segments that share an end are joined into continuous paths, each drawn as a
+    // soft ribbon: the copper glows faintly as if powered, and bright pulses with fading tails run along it.
+    function chain(segments) {
+      const key = (x, z) => `${x.toFixed(2)},${z.toFixed(2)}`;
+      const ends = new Map();
+      segments.forEach(([x1, z1, x2, z2], i) => {
+        for (const k of [key(x1, z1), key(x2, z2)]) ends.set(k, [...(ends.get(k) || []), i]);
+      });
+      const used = new Set(), paths = [];
+      const walk = (i, fromStart) => {
+        const pts = [];
+        let [x1, z1, x2, z2] = segments[i];
+        if (!fromStart) [x1, z1, x2, z2] = [x2, z2, x1, z1];
+        pts.push([x1, z1], [x2, z2]);
+        used.add(i);
+        for (;;) {
+          const [x, z] = pts[pts.length - 1];
+          const next = (ends.get(key(x, z)) || []).find((j) => !used.has(j));
+          if (next == null) return pts;
+          used.add(next);
+          const [a, b, c, d] = segments[next];
+          pts.push(key(a, b) === key(x, z) ? [c, d] : [a, b]);
+        }
+      };
+      // Start from the loose ends first so each path runs end to end.
+      const order = [...segments.keys()].sort((i, j) => {
+        const deg = (k) => (ends.get(k) || []).length;
+        const [a, b] = segments[i], [c, d] = segments[j];
+        return (deg(key(a, b)) === 2) - (deg(key(c, d)) === 2);
+      });
+      for (const i of order) if (!used.has(i)) paths.push(walk(i, true));
+      return paths;
+    }
+
+    function ribbon(paths, half) {
+      const pos = [], dist = [], side = [], seed = [], index = [];
+      for (const pts of paths) {
+        const s0 = Math.random() * 40;
+        let d = 0;
+        const base = pos.length / 3;
+        for (let i = 0; i < pts.length; i++) {
+          const [x, z] = pts[i];
+          if (i) d += Math.hypot(x - pts[i - 1][0], z - pts[i - 1][1]);
+          const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)];
+          let tx = b[0] - a[0], tz = b[1] - a[1];
+          const tl = Math.hypot(tx, tz) || 1;
+          tx /= tl; tz /= tl;
+          for (const sd of [-1, 1]) {
+            pos.push(x - tz * half * sd, 0.08, z + tx * half * sd);
+            dist.push(d); side.push(sd); seed.push(s0);
+          }
+          if (i) {
+            const k = base + (i - 1) * 2;
+            index.push(k, k + 1, k + 2, k + 1, k + 3, k + 2);
+          }
+        }
+      }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      geo.setAttribute('aDist', new THREE.Float32BufferAttribute(dist, 1));
+      geo.setAttribute('aSide', new THREE.Float32BufferAttribute(side, 1));
+      geo.setAttribute('aSeed', new THREE.Float32BufferAttribute(seed, 1));
+      geo.setIndex(index);
+      return geo;
+    }
+
     function addCurrent(model, url) {
       const copper = model.children.find((n) => n.name === 'top-copper');
       if (!copper) return;
       fetch(url).then((r) => r.json()).then(({ segments }) => {
-        const items = [];
-        for (const [x1, z1, x2, z2] of segments) {
-          const len = Math.hypot(x2 - x1, z2 - z1);
-          const n = Math.max(1, Math.round(len / 1.6));
-          for (let k = 0; k < n; k++) items.push({ x1, z1, x2, z2, len, phase: k / n + Math.random() * 0.15 });
-        }
-        const pos = new Float32Array(items.length * 3);
-        const geo = new THREE.BufferGeometry();
-        geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-        const mat = new THREE.PointsMaterial({
-          map: dotTexture(), size: 1.15, sizeAttenuation: true, transparent: true, depthWrite: false,
-          blending: THREE.AdditiveBlending, color: 0xffd98a,
+        const material = new THREE.ShaderMaterial({
+          uniforms: { uTime: { value: 0 } },
+          vertexShader: `
+            attribute float aDist; attribute float aSide; attribute float aSeed;
+            varying float vDist; varying float vSide;
+            void main() {
+              vDist = aDist + aSeed; vSide = aSide;
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }`,
+          fragmentShader: `
+            uniform float uTime;
+            varying float vDist; varying float vSide;
+            void main() {
+              float s = abs(vSide);
+              float core = exp(-s * s * 18.0);            // the trace itself
+              float halo = exp(-s * s * 3.0) * 0.45;      // light spilling onto the board
+              float q = fract((vDist - uTime * 7.0) / 11.0);
+              float pulse = pow(q, 7.0) * smoothstep(1.0, 0.965, q);   // sharp head, long fading tail
+              float glow = core * (0.16 + 1.9 * pulse) + halo * pulse;
+              vec3 amber = vec3(1.0, 0.56, 0.18);
+              vec3 hot = vec3(1.0, 0.95, 0.82);
+              gl_FragColor = vec4(mix(amber, hot, clamp(pulse * core * 1.4, 0.0, 1.0)) * glow, 1.0);
+            }`,
+          transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
         });
-        pulses = { items, pos, geo, points: new THREE.Points(geo, mat) };
-        pulses.points.renderOrder = 10;
-        copper.add(pulses.points);
+        const mesh = new THREE.Mesh(ribbon(chain(segments), 0.42), material);
+        mesh.renderOrder = 10;
+        copper.add(mesh);
+        current = material;
       }).catch(() => {});
     }
     function stepCurrent(t) {
-      if (!pulses) return;
-      const { items, pos, geo } = pulses;
-      for (let i = 0; i < items.length; i++) {
-        const it = items[i];
-        const f = (it.phase + t * 4.2 / Math.max(it.len, 2)) % 1;   // about 4 mm a second
-        pos[i * 3] = it.x1 + (it.x2 - it.x1) * f;
-        pos[i * 3 + 1] = 0.12;
-        pos[i * 3 + 2] = it.z1 + (it.z2 - it.z1) * f;
-      }
-      geo.attributes.position.needsUpdate = true;
+      if (current) current.uniforms.uTime.value = t;
     }
 
     // Labels: each layer's name sits in a column to the right, joined to the layer's edge by a thin line.
@@ -134,7 +196,28 @@
         aimX = Math.max(-1, Math.min(1, pointer.x));
         aimY = Math.max(-1, Math.min(1, pointer.y));
       }, { passive: true });
-      el.addEventListener('pointerleave', () => { pointer.set(9, 9); aimX = aimY = 0; });
+      el.addEventListener('pointerleave', () => { if (!drag) { pointer.set(9, 9); aimX = aimY = 0; } });
+      // Grab a layer and it comes out with the pointer, then springs back into the stack when let go.
+      el.addEventListener('pointerdown', (e) => {
+        if (!heroModel || e.button > 0) return;
+        const r = el.getBoundingClientRect();
+        pointer.set((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+        ray.setFromCamera(pointer, camera);
+        const hit = ray.intersectObjects(layers.map(([n]) => n), true).find((x) => x.object.isMesh);
+        const node = hit && layerOf(hit.object);
+        if (!node) return;
+        const normal = camera.getWorldDirection(new THREE.Vector3());
+        drag = {
+          node, plane: new THREE.Plane().setFromNormalAndCoplanarPoint(normal, hit.point),
+          start: heroModel.worldToLocal(hit.point.clone()), from: (pull.get(node) || new THREE.Vector3()).clone(),
+        };
+        hovered = node;
+        el.setPointerCapture(e.pointerId);
+        el.classList.add('dragging');
+      });
+      const release = () => { drag = null; el.classList.remove('dragging'); };
+      el.addEventListener('pointerup', release);
+      el.addEventListener('pointercancel', release);   // e.g. a phone turned the gesture into a scroll
       // Phones: tilt the phone to tilt the board, where the browser allows it without asking.
       window.addEventListener('deviceorientation', (e) => {
         if (e.gamma == null) return;
@@ -175,6 +258,7 @@
           stage = new THREE.Group();
           stage.add(model);
           scene.add(stage);
+          heroModel = model;
           if (hero.traces) addCurrent(model, hero.traces);
         } else {
           scene.add(model);
@@ -245,19 +329,24 @@
         stage.rotation.set(-0.12 * tiltY, -0.55 + ease * 1.05 + tiltX * 0.28, 0.05 * tiltX);
         stage.updateMatrixWorld(true);
         ray.setFromCamera(pointer, camera);
-        const hit = ray.intersectObjects(layers.map(([n]) => n), true).find((x) => x.object.isMesh);
-        hovered = null;
-        if (spread > 0.45 && hit) {
-          for (let o = hit.object; o; o = o.parent) {
-            const found = layers.find(([n]) => n === o);
-            if (found) { hovered = found[0]; break; }
+        if (drag) {
+          if (ray.ray.intersectPlane(drag.plane, hitPoint)) {
+            const moved = heroModel.worldToLocal(hitPoint.clone()).sub(drag.start);
+            pull.set(drag.node, drag.from.clone().add(moved).clampLength(0, 34));
           }
+          hovered = drag.node;
+        } else {
+          const hit = ray.intersectObjects(layers.map(([n]) => n), true).find((x) => x.object.isMesh);
+          hovered = hit ? layerOf(hit.object) : null;
         }
+        el.classList.toggle('can-grab', !!hovered && !drag);
         for (const [n, y] of layers) {
           const was = lift.get(n) || 0;
-          const l = was + ((hovered === n ? 1.6 : 0) - was) * 0.15;
+          const l = was + ((hovered === n && spread > 0.45 && !drag ? 1.6 : 0) - was) * 0.15;
           lift.set(n, l);
-          n.position.y = y * spread + l;
+          const pl = pull.get(n) || zero;
+          if (!drag || drag.node !== n) pl.lerp(zero, 0.085);   // spring back once let go
+          n.position.set(pl.x, y * spread + l + pl.y, pl.z);
         }
         stepCurrent(calm ? 0 : t);
         if (size) placeLabels(Math.max(0, Math.min(1, (spread - 0.45) / 0.5)).toFixed(3));

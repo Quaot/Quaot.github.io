@@ -8,7 +8,7 @@ hero_layers:
   traces: media/pcb-ldo/traces.json   # from scripts/trace_paths.py
   caption: The 3.3 V regulator board, separated into five of its fabrication layers. The readings are its calculated
     full-load design values.
-  hint: Scroll to take it apart
+  hint: Scroll to take it apart, or grab a layer
   readout:   # [what it is, value], from the board's README
   - [in, 5.0 V]
   - [out, 3.3 V]
