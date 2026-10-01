@@ -203,16 +203,49 @@
             h('span', { class: 'thumb-cat' }, x.category))))));
   }
 
-  // ---- profile ------------------------------------------------------------------------------
+  // ---- profile: an opener, headline numbers, a shelf of things I have made, the story, the path so far,
+  // skills, what I am doing now, and a way to get in touch. Everything comes from `profile` in site.yaml.
+  const STAT_COLOURS = ['bakfiets', 'ai-phillic', 'chess-mobility', 'ib-paper-organizer'];
   function profileView(d) {
-    const hm = d.hero_model;
+    const pr = d.profile || {};
+    const all = projects(d);
+    const byId = (id) => all.find((x) => x.id === id);
+    const tint = (id) => (byId(id) ? paint(byId(id)) : '--c:var(--accent);--on:#f6f0e4');
+    const mail = (d.links || []).find((l) => l.url.startsWith('mailto:'));
+    const h2 = (lead, rest) => h('h2', { class: 'pf-h2' }, h('em', {}, lead), rest);
     return h('div', { class: 'page profile', style: '--c:#e4572e;--on:#f6f0e4' },
-      hm && hm.src ? h('div', { class: 'stack' }, shot({ src: hm.src, type: 'stl' }, true)) : null,
-      textBlock([h('h1', {}, 'A bit more ', h('em', {}, 'about me'), '...')], paras(d.about),
-        [{ label: 'Résumé (PDF)', url: 'media/resume.pdf' }]),
+      h('header', { class: 'pf-head' },
+        h('h1', {}, 'A bit more ', h('em', {}, 'about me'), '.'),
+        pr.lead ? h('p', { class: 'pf-lead' }, rich(pr.lead)) : null),
+      pr.stats ? h('section', { class: 'pf-stats', 'aria-label': 'In numbers' }, pr.stats.map(([n, text], k) =>
+        h('div', { class: 'stat', style: tint(STAT_COLOURS[k]) },
+          h('span', { class: 'stat-num' }, n), h('span', { class: 'stat-text' }, text)))) : null,
+      pr.shelf ? h('section', { class: 'pf-shelf' }, h2('Things', ' I have made'),
+        h('div', { class: 'shelf' }, pr.shelf.map((it) =>
+          h('a', { class: 'shelf-item', href: `#/p/${it.project}`, style: tint(it.project) },
+            h('div', { class: 'shelf-stage' }, viewer({ src: it.src, type: it.type }, 'still')),
+            h('span', { class: 'shelf-label' }, it.label),
+            h('span', { class: 'shelf-go' }, 'View project →'))))) : null,
+      textBlock([h2('The', ' longer version')], paras(d.about), [{ label: 'Résumé (PDF)', url: 'media/resume.pdf' }]),
+      pr.timeline ? h('section', { class: 'pf-time' }, h2('The path', ' so far'),
+        h('ol', { class: 'timeline' }, pr.timeline.map((it) => {
+          const inner = [h('span', { class: 'tl-when' }, it.when), h('span', { class: 'tl-what' }, it.what),
+            it.detail ? h('span', { class: 'tl-detail' }, it.detail) : null];
+          const to = it.project ? h('a', { href: `#/p/${it.project}` }, inner)
+            : it.link ? h('a', { href: it.link, target: '_blank', rel: 'noopener' }, inner) : h('div', {}, inner);
+          return h('li', { class: 'tl-item', style: tint(it.project) }, to);
+        }))) : null,
+      pr.skills ? h('section', { class: 'pf-skills' }, h2('Tools', ' I use'),
+        h('dl', {}, pr.skills.map(([group, items]) => [h('dt', {}, group),
+          h('dd', {}, items.map((x) => h('span', { class: 'chip' }, x)))]))) : null,
       d.now && d.now.items ? h('section', { class: 'now' },
         h('h2', {}, h('em', {}, 'Now'), h('span', { class: 'now-when' }, d.now.when || '')),
-        h('ol', {}, d.now.items.map((t) => h('li', {}, rich(t))))) : null);
+        h('ol', {}, d.now.items.map((t) => h('li', {}, rich(t))))) : null,
+      h('section', { class: 'pf-cta' },
+        h('p', {}, 'Looking for a ', h('em', {}, 'co-op'), ' placement.'),
+        h('div', { class: 'pf-buttons' },
+          h('a', { class: 'btn', href: 'media/resume.pdf', target: '_blank', rel: 'noopener' }, 'Download my résumé'),
+          mail ? h('a', { class: 'btn ghost', href: mail.url }, mail.url.slice(7)) : null)));
   }
 
   // ---- motion: pictures and text rise in as they scroll into view ---------------------------
@@ -224,7 +257,7 @@
   function animate(root) {
     if (!reveal) return;
     root.classList.add('motion');
-    $$('.shot, .tile, .about, .swatch, .next, .thumb, .now, .fig', root).forEach((el, k) => {
+    $$('.shot, .tile, .about, .swatch, .next, .thumb, .now, .fig, .stat, .shelf-item, .tl-item, .pf-skills, .pf-cta', root).forEach((el, k) => {
       if (el.classList.contains('swatch')) el.style.transitionDelay = `${(k % 12) * 45}ms`;
       reveal.observe(el);
     });

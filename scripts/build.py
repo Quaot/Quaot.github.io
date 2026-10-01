@@ -65,7 +65,8 @@ def main():
         if src and not (ROOT / src).is_file():
             errors.append(f"{where}: media file not found: {src}")
 
-    check_media((site.get("hero_model") or {}).get("src"), "site.yaml hero_model")
+    for item in (site.get("profile") or {}).get("shelf") or []:
+        check_media(item.get("src"), "site.yaml profile shelf")
     check_media((site.get("hero_layers") or {}).get("src"), "site.yaml hero_layers")
     check_media((site.get("hero_layers") or {}).get("traces"), "site.yaml hero_layers")
 

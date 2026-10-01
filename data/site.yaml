@@ -14,12 +14,60 @@ hero_layers:
   - [out, 3.3 V]
   - [load, 500 mA]
   - [junction, 116 °C]
-hero_model:
-  src: media/printing/enclosure-base.stl
-  caption: An enclosure base generated from a KiCad board file. Drag to rotate.
-about: 'I am a first-year Electrical Engineering student at the University of Waterloo, class of 2031. Before Waterloo,
-  I completed the IB Diploma in Langley, BC, with a score of 40 out of 45, and worked as a robotics coach at Zebra
-  Robotics, where classes were mostly in Scratch and Python.
+# ---- Profile page --------------------------------------------------------------------------------------
+profile:
+  lead: First-year Electrical Engineering student at the University of Waterloo, class of 2031, and project lead of
+    Bakfiets at Electrium Mobility.
+  # Big numbers across the top: [number, what it means]
+  stats:
+  - ['25', people on the Bakfiets team I lead]
+  - [1st, of 20 teams at IDEA-X, with a $10,000 prize]
+  - [40/45, on the IB Diploma]
+  - [1 of 6, academic reps elected by about 150 classmates]
+  # 3D objects on the shelf, each linking to its project
+  shelf:
+  - {project: ldo-board, src: media/pcb-ldo/board.glb, type: glb, label: 3.3 V regulator board}
+  - {project: r2r-dac, src: media/r2r/board.glb, type: glb, label: R-2R DAC concept board}
+  - {project: rolling-wheel, src: media/physics/insert.stl, type: stl, label: Wheel insert}
+  - {project: 3d-printing, src: media/printing/switch-fidget-exploded.stl, type: stl, label: Switch fidget}
+  # The path so far, oldest first: when, what, detail, optional project id or link
+  timeline:
+  - when: Jun 2023 to Jan 2025
+    what: Junior Robotics Coach, Zebra Robotics
+    detail: Coached robotics classes in Scratch and Python for 19 months.
+  - when: '2024'
+    what: IB Paper Organizer, first version
+    detail: A single HTML page that sorted my past papers. It is now a desktop app.
+    project: ib-paper-organizer
+  - when: '2025'
+    what: Started 3D printing
+    detail: Parts in Fusion 360, then generated with Python, including the wheel for my Physics IA.
+    project: 3d-printing
+  - when: '2026'
+    what: First place at IDEA-X
+    detail: AI-Phillic, built with three classmates, won first of 20 teams and $10,000.
+    project: ai-phillic
+  - when: '2026'
+    what: IB Diploma, 40 out of 45
+    detail: In Langley, BC.
+  - when: Jun to Sept 2026
+    what: UI/UX Designer, ForgeX Trading
+    detail: Designed and shipped the landing page for a trading replay platform, from Figma to production.
+    link: https://forgextrading.com/
+  - when: Sept 2026
+    what: Electrical Engineering at Waterloo
+    detail: Project lead of Bakfiets at Electrium Mobility, and one of six academic reps for my class.
+    project: bakfiets
+  # Skills, grouped as on the résumé
+  skills:
+  - [Hardware, [Altium Designer, KiCad, Schematic capture, 2-layer PCB layout, SPICE, Oscilloscope, Fusion 360,
+      3D printing]]
+  - [Analysis, [Thermal budgeting, Datasheet review, Capacitor derating]]
+  - [Software, [Python, TypeScript, JavaScript, HTML and CSS, React, React Native, Electron]]
+  - [Tools, [Git, GitHub, Figma, Supabase]]
+about: 'Before Waterloo, I completed the IB Diploma in Langley, BC, with a score of 40 out of 45. I coached robotics
+  at Zebra Robotics, where classes were mostly in Scratch and Python, and spent the summer of 2026 as the UI/UX
+  designer at ForgeX Trading.
 
 
   This term I lead Bakfiets, a 25-person team within Electrium Mobility building an electric cargo bike. I was also

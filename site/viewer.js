@@ -228,6 +228,9 @@
 
     function frame(r) {
       loading.remove();
+      const aspect = el.clientWidth / (el.clientHeight || 1);
+      if (aspect < 1) r *= Math.pow(1 / aspect, 0.8);   // tall boxes (the profile shelf): step back so it fits across
+
       camera.position.set(r * 2.1, r * 1.5, r * 2.6);
       controls.target.set(0, 0, 0);
       controls.minDistance = r * 1.4;
