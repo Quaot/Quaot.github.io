@@ -18,15 +18,22 @@ media:
 - type: stl
   src: media/printing/switch-fidget-exploded.stl
   alt: Interactive 3D model of the switch fidget, bottom cap, housing and keycap
+  caption: 'The switch fidget, exploded: cap, housing and keycap.'
 - type: image
   src: media/printing/process/switch-coupons.png
   alt: A strip of six switch cutouts and a strip of six keycap sockets, each marked with notches
+  caption: Test coupons for the switch cutout, 13.8 to 14.3 mm, and the keycap stem.
 - type: image
   src: media/printing/process/switch-parts.png
   alt: The fidget's cap, housing and keycap
+  caption: The three fidget parts. Not printed yet.
+  beside: true
 - type: stl
   src: media/printing/enclosure-base.stl
   alt: Interactive 3D model of an enclosure base generated from a KiCad board
+  caption: An enclosure base generated from a KiCad board file.
 - type: image
   src: media/printing/process/enclosure-base.svg
   alt: Line drawing of an enclosure base generated from a KiCad board
+  caption: The same base as a drawing, with a standoff under each mounting hole.
+  beside: true

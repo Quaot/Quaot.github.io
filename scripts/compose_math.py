@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pymupdf
 
-from compose_physics import render_plate
+from compose_physics import render_pages, render_plate
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -26,6 +26,9 @@ FIGURES = {
 }
 
 
+PAGES = [(2, 'beginning'), (9, 'middle'), (19, 'end')]   # introduction, the probability, the conclusion
+
+
 def main(pdf):
     doc = pymupdf.open(pdf)
     out = ROOT / 'media' / 'chess'
@@ -34,6 +37,7 @@ def main(pdf):
         plate = render_plate(doc[i], box)
         plate.save(out / f'{name}.jpg', quality=88, optimize=True)
         print(f'media/chess/{name}.jpg', plate.size)
+    render_pages(doc, PAGES, out / 'pages')
 
 
 if __name__ == '__main__':

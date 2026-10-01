@@ -20,9 +20,13 @@ media:
 - type: image
   src: media/ib-paper-organizer/screens/library.jpg
   alt: The IB Paper Organizer library, a list of past papers with filters for subject, year, session and level
+  caption: My library of 188 past papers.
 - type: image
   src: media/ib-paper-organizer/screens/search.jpg
   alt: The library filtered by a search for physics 2024
+  caption: A search for physics 2024.
 - type: image
   src: media/ib-paper-organizer/screens/viewer.jpg
   alt: A paper open in the app's preview pane, with the exam page blurred
+  caption: A paper open in the preview pane, blurred because IB papers are under copyright.
+  beside: true

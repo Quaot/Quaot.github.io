@@ -19,23 +19,33 @@ media:
 - type: glb
   src: media/pcb-ldo/board.glb
   alt: Interactive 3D model of the assembled regulator board
+  caption: The assembled board, modelled from my Gerbers and the Altium STEP export.
 - type: image
   src: media/pcb-ldo/render.png
   alt: 3D render of the regulator board from Altium
+  caption: Altium's render. The board is 17 by 28 mm.
 - type: image
   src: media/pcb-ldo/schematic.png
   alt: Altium schematic of the LM1117 regulator circuit, with input and output connectors, divider resistors, capacitors
     and a power LED
+  caption: 'The schematic: the LM1117, the 162 Ω and 267 Ω divider, and a power LED.'
+  beside: true
 - type: image
   src: media/pcb-ldo/process/window.svg
   alt: Chart of the worst-case output voltage window, 3.20 to 3.44 V, around the 3.3 V target
+  caption: Worst-case output with every tolerance against me.
 - type: image
   src: media/pcb-ldo/process/thermal.svg
   alt: Junction temperature of 116 °C at 45 °C ambient, 9 °C under the 125 °C limit
+  caption: Calculated junction temperature at 500 mA on a 45 °C day.
+  beside: true
 - type: image
   src: media/pcb-ldo/layout.png
   alt: PCB layout of the regulator board, labelled JUSTIN LDO V1
+  caption: The two-layer layout.
 - type: image
   src: media/pcb-ldo/process/layers.png
   dark: true
   alt: The board separated into its fabrication layers, bottom copper, board, top copper, solder mask and silkscreen
+  caption: The board split into its fabrication layers, from the Gerbers.
+  beside: true

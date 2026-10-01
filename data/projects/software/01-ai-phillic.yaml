@@ -24,23 +24,34 @@ cover:
 media:
 - type: image
   src: media/ai-phillic/screens/lesson.jpg
-  alt: Three AI-Phillic screens, the river map of lessons, an illustrated story page and a quiz that rebuilds the lesson's
-    key sentence from tiles
+  alt: Three AI-Phillic screens, the river map of lessons, an illustrated story page and a quiz that rebuilds the
+    lesson's key sentence from tiles
+  caption: The river of lessons, a story page and the quiz.
 - type: image
   src: media/ai-phillic/screens/teaching.jpg
-  alt: Three AI-Phillic screens, a teaching page on strong and weak evidence, a reflection prompt and the source scanner
+  alt: Three AI-Phillic screens, a teaching page on strong and weak evidence, a reflection prompt and the source
+    scanner
+  caption: A teaching page, the reflection prompt and the source scanner.
 - type: image
   src: media/ai-phillic/screens/progress.jpg
   alt: Three AI-Phillic screens, progress by topic, the lesson cards along the river and the welcome screen
+  caption: Progress by topic, the lesson cards and the welcome screen.
+  beside: true
 - type: image
   src: media/ai-phillic/award.jpg
   alt: The glass IDEA-X Outstanding Solution award from Langley Schools, held in one hand
+  caption: The Outstanding Solution award, IDEA-X 2026.
 - type: image
   src: media/ai-phillic/lesson-001-b2.jpg
   alt: Illustration of a duckling on a log reading a tablet, from lesson one
+  caption: From lesson one.
+  beside: true
 - type: image
   src: media/ai-phillic/lesson-002-b3.jpg
   alt: Illustration of a beaver with a magnifying glass studying a map on a barrel
+  caption: From lesson two.
 - type: image
   src: media/ai-phillic/lesson-003-b2.jpg
   alt: Illustration of two frogs on a dock holding up maps
+  caption: From lesson three.
+  beside: true

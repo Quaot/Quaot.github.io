@@ -18,7 +18,10 @@ cover:
 media:
 - type: image
   src: media/ironlog/screens/overview.jpg
-  alt: Three IronLog screens, today's plan, a workout in progress with weight and rep sliders, and the progress charts
+  alt: Three IronLog screens, today's plan, a workout in progress with weight and rep sliders, and the progress
+    charts
+  caption: Today's plan, a workout in progress and the month's progress.
 - type: image
   src: media/ironlog/screens/workout-history.jpg
   alt: Two IronLog screens, a workout in progress and the history of past sessions
+  caption: A set being logged, and the history of past sessions.

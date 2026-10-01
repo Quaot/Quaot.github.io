@@ -17,3 +17,4 @@ media:
 - type: image
   src: media/youtonomous/screens/player.jpg
   alt: The Youtonomous window playing a saved video, with chapter ticks on the seek bar and a list of bookmarks
+  caption: A saved video, its chapters as ticks on the seek bar and the bookmarks on the right.

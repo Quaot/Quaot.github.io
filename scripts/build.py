@@ -8,6 +8,7 @@ site/media/. Run it after editing anything in data/ or media/:
     python scripts/build.py --serve     # build, then preview at http://localhost:8000
 """
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -37,6 +38,25 @@ def cover_aspect(p):
         return round(im.width / im.height, 4)
 
 
+def image_aspect(src):
+    """Width over height of an image file; SVGs are read from their viewBox."""
+    path = ROOT / src
+    if src.endswith(".svg"):
+        m = re.search(r'viewBox="[\d.\s-]*?([\d.]+)\s+([\d.]+)"', path.read_text(encoding="utf-8"))
+        return round(float(m.group(1)) / float(m.group(2)), 4) if m else 1.5
+    with Image.open(path) as im:
+        return round(im.width / im.height, 4)
+
+
+def media_aspect(m):
+    """The shape a picture keeps on the project page. 3D viewers get a 3:2 stage."""
+    if m.get("type") == "image":
+        return image_aspect(m["src"])
+    if m.get("type") == "pages":
+        return image_aspect(m["pages"][0]["src"])
+    return 1.5
+
+
 def main():
     errors = []
     site = load(DATA / "site.yaml")
@@ -61,12 +81,18 @@ def main():
             check_media((p.get("cover") or {}).get("src"), where)
             check_media(((p.get("cover") or {}).get("poster") or {}).get("logo"), where)
             for m in p.get("media") or []:
+                if m.get("type") == "pages":
+                    for pg in m.get("pages") or []:
+                        check_media(pg.get("src"), where)
+                    continue
                 check_media(m.get("src"), where)
                 if m.get("type") not in ("image", "stl", "glb"):
-                    errors.append(f"{where}: media type must be image, stl or glb, got {m.get('type')!r}")
+                    errors.append(f"{where}: media type must be image, stl, glb or pages, got {m.get('type')!r}")
             p["id"] = path.stem.split("-", 1)[-1]
             if not errors:
                 p["cover_aspect"] = cover_aspect(p)
+                for m in p.get("media") or []:
+                    m["aspect"] = media_aspect(m)
             projects.append(p)
         categories.append({"id": cat["id"], "title": cat.get("title", cat["id"]), "projects": projects})
 

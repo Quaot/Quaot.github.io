@@ -17,14 +17,19 @@ media:
 - type: glb
   src: media/r2r/board.glb
   alt: Interactive 3D model of a concept two-layer board for the ladder, with eight 0805 resistors and two pin headers
+  caption: A concept layout for the ladder on a 33 by 20 mm board. Not manufactured.
 - type: image
   src: media/r2r/schematic-clean.svg
   alt: Schematic of the 4-bit R-2R ladder, four 20k legs from B0 to B3 into a chain of 10k resistors, RT to ground,
     output at VOUT
+  caption: 'The 4-bit ladder: four 20k legs into a chain of 10k resistors.'
 - type: image
   src: media/r2r/process/steps.svg
   alt: Step line of output voltage for all 16 input codes, from 0 V up to 3.09 V
+  caption: The ideal output for all 16 codes, 0.206 V apart.
 - type: image
   src: media/r2r/process/layers.png
   dark: true
   alt: The concept board separated into its layers
+  caption: The concept board split into its layers.
+  beside: true

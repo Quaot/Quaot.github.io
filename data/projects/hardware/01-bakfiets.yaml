@@ -21,16 +21,24 @@ cover:
 media:
 - type: image
   src: media/bakfiets/bike-render.jpg
-  alt: SolidWorks render of the full bakfiets, a green cargo bike with a wooden box between the seat and the front wheel
+  alt: SolidWorks render of the full bakfiets, a green cargo bike with a wooden box between the seat and the front
+    wheel
+  caption: The full bike as modelled in SolidWorks by the 2024 team.
 - type: image
   src: media/bakfiets/bike-labelled.jpg
   alt: The same render with each part labelled, and a list of the parts not yet in the model
+  caption: The same render, labelled, with the parts not yet in the model listed on the right.
 - type: image
   src: media/bakfiets/assemblies.jpg
-  alt: Two SolidWorks assemblies of the full bike, the 2024 model on the left and the 2025 co-op rebuild on the right
+  alt: Two SolidWorks assemblies of the full bike, the 2024 model on the left and the 2025 co-op rebuild on the
+    right
+  caption: The 2024 assembly, left, and the rebuild the 2025 co-op students started, right.
 - type: image
   src: media/bakfiets/onboarding-path.jpg
   alt: Onboarding path diagram, from setup through each subteam's stages to the term projects
+  caption: The onboarding path I drew for new members.
 - type: image
   src: media/bakfiets/power-flow.jpg
   alt: Power flow diagram of the bike, from charger and battery through the motor controller to the electronics
+  caption: How power moves from the charger and battery through the motor controller.
+  beside: true

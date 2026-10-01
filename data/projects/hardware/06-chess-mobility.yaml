@@ -17,27 +17,50 @@ cover:
   src: media/chess/rook-board.jpg
 media:
 - type: image
-  src: media/chess/rook-board.jpg
-  alt: A rook near the centre of an empty board, with the 14 squares it can reach shaded
-- type: image
   src: media/chess/rook-blocked.jpg
   alt: The rook's four directions to the edge of the board, and the same rook stopped by pieces in its way
+  caption: The rook's four directions, and the same rook stopped by pieces in its way.
+- type: pages
+  caption: 'Three pages from the exploration: the introduction, the probability and the conclusion. Click to read.'
+  pages:
+  - src: media/chess/pages/beginning.jpg
+    label: Beginning
+    alt: Page from the Math IA, beginning
+  - src: media/chess/pages/middle.jpg
+    label: Middle
+    alt: Page from the Math IA, middle
+  - src: media/chess/pages/end.jpg
+    label: End
+    alt: Page from the Math IA, end
+- type: image
+  src: media/chess/rook-board.jpg
+  alt: A rook near the centre of an empty board, with the 14 squares it can reach shaded
+  caption: On an empty board a rook reaches 14 squares.
 - type: image
   src: media/chess/rook-anywhere.jpg
   alt: Rooks in a corner, on an edge and in the centre, each reaching the same 14 squares on an empty board
+  caption: From a corner, an edge or the centre, it is still 14.
+  beside: true
 - type: image
   src: media/chess/ray-friendly.jpg
   alt: A rook's path along one line, stopping before the first square held by a friendly piece
+  caption: 'A friendly piece in the way: the rook stops before it.'
 - type: image
   src: media/chess/ray-enemy.jpg
   alt: A rook's path along one line, ending by capturing the first enemy piece
+  caption: 'An enemy in the way: the rook can capture it.'
+  beside: true
 - type: image
   src: media/chess/knight-edge.jpg
   alt: A knight near the edge of the board, with several of its moves falling off the board
+  caption: Near the edge, many of a knight's jumps land off the board.
 - type: image
   src: media/chess/king-edge.jpg
   alt: A king near the edge of the board, with all of its moves still on the board
+  caption: A king near the edge keeps all of its moves.
+  beside: true
 - type: image
   src: media/chess/mobility.jpg
-  alt: Graph of expected mobility for king, knight, bishop, rook and queen as the number of pieces falls from 32 to 2,
-    with the queen highest and rising fastest
+  alt: Graph of expected mobility for king, knight, bishop, rook and queen as the number of pieces falls from 32
+    to 2, with the queen highest and rising fastest
+  caption: Expected moves for each piece as the board empties, from 32 pieces down to 2.

@@ -108,6 +108,34 @@
       h('img', { src: m.src, alt: m.alt || '', loading: first ? 'eager' : 'lazy' }));
   }
 
+  // One picture with its numbered caption. Pictures open in the viewer when clicked.
+  function figure(m, k, first) {
+    const media = m.type === 'pages'
+      ? h('div', { class: 'sheets' }, m.pages.map((pg) => h('button', { class: 'sheet', type: 'button', 'data-zoom': '' },
+        h('img', { src: pg.src, alt: pg.alt || '', loading: 'lazy', 'data-caption': `${pg.label}. ${(m.caption || '').replace(/\s*Click to read\.$/, '')}` }),
+        h('span', { class: 'sheet-label' }, h('em', {}, pg.label)))))
+      : shot(m, first);
+    if (m.type === 'image') {
+      const img = media.querySelector('img');
+      img.dataset.caption = m.caption || '';
+      media.setAttribute('data-zoom', '');
+    }
+    return h('figure', { class: 'fig' + (m.type === 'pages' ? ' fig-pages' : ''), style: `flex-grow:${m.aspect || 1.5}` }, media,
+      m.caption ? h('figcaption', {}, h('span', { class: 'fig-num' }, num(k)), h('span', {}, m.caption)) : null);
+  }
+
+  // The pictures after the hero, in rows: an item marked `beside` shares the previous item's row,
+  // and a row's pictures are scaled to one height so each keeps its own shape.
+  function gallery(items) {
+    const rows = [];
+    items.forEach((m, k) => {
+      if (m.beside && rows.length) rows[rows.length - 1].push([m, k]); else rows.push([[m, k]]);
+    });
+    return h('div', { class: 'gallery' }, rows.map((row) =>
+      h('div', { class: 'row' + (row.length > 1 ? ' multi' : '') + (row[0][0].type === 'pages' ? ' pages' : '') },
+        row.map(([m, k]) => figure(m, k + 1, false)))));
+  }
+
   function textBlock(head, paragraphs, links) {
     return h('section', { class: 'about' },
       h('header', { class: 'about-head' }, head),
@@ -128,12 +156,13 @@
     const step = (x, label) => h('a', { href: `#/p/${x.id}`, style: paint(x) },
       h('span', { class: 'step-label' }, label), h('span', { class: 'step-title' }, x.title));
     return h('article', { class: 'page project', style: paint(p) },
-      h('div', { class: 'stack' }, (p.media || []).map((m, k) => shot(m, k === 0))),
+      (p.media || []).length ? h('div', { class: 'hero-shot' }, figure(p.media[0], 0, true)) : null,
       textBlock([
         h('span', { class: 'big-num' }, num(p.n)),
         h('h1', {}, p.title),
         h('span', { class: 'cat' }, p.category),
       ], paras(p.summary), p.links),
+      (p.media || []).length > 1 ? gallery(p.media.slice(1)) : null,
       h('nav', { class: 'next' }, step(prev, 'Previous Project'), step(next, 'Next Project')),
       h('section', { class: 'more' },
         h('h2', {}, h('em', {}, 'More'), ' selected projects'),
@@ -164,11 +193,63 @@
   function animate(root) {
     if (!reveal) return;
     root.classList.add('motion');
-    $$('.shot, .tile, .about, .swatch, .next, .thumb, .now, .hero', root).forEach((el, k) => {
+    $$('.shot, .tile, .about, .swatch, .next, .thumb, .now, .hero, .fig', root).forEach((el, k) => {
       if (el.classList.contains('swatch')) el.style.transitionDelay = `${(k % 12) * 45}ms`;
       reveal.observe(el);
     });
   }
+
+  // ---- viewer: every picture on a project page opens large, with arrows and its caption ---------
+  const box = h('div', { class: 'lightbox', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Picture viewer', hidden: '' },
+    h('button', { class: 'lb-close', type: 'button', 'aria-label': 'Close' }, '×'),
+    h('button', { class: 'lb-prev', type: 'button', 'aria-label': 'Previous picture' }, '←'),
+    h('figure', { class: 'lb-fig' }, h('img', { alt: '' }), h('figcaption', {}, h('span', { class: 'lb-count' }), h('span', { class: 'lb-cap' }))),
+    h('button', { class: 'lb-next', type: 'button', 'aria-label': 'Next picture' }, '→'));
+  document.body.append(box);
+  let pics = [], at = 0, opener = null;
+  function show(k) {
+    at = (k + pics.length) % pics.length;
+    const img = pics[at];
+    $('img', box).src = img.currentSrc || img.src;
+    $('img', box).alt = img.alt;
+    $('.lb-cap', box).textContent = img.dataset.caption || '';
+    $('.lb-count', box).textContent = `${num(at)} / ${num(pics.length - 1)}`;
+  }
+  function openAt(img) {
+    pics = $$('[data-zoom] img', $('[data-view]'));
+    opener = img;
+    box.hidden = false;
+    document.documentElement.classList.add('lb-open');
+    show(pics.indexOf(img));
+    $('.lb-close', box).focus();
+  }
+  function close() {
+    box.hidden = true;
+    document.documentElement.classList.remove('lb-open');
+    if (opener) opener.closest('[data-zoom]').focus?.();
+  }
+  document.addEventListener('click', (e) => {
+    const zoom = e.target.closest('[data-zoom]');
+    if (zoom && !box.contains(zoom)) { e.preventDefault(); openAt($('img', zoom)); }
+  });
+  $('.lb-close', box).addEventListener('click', close);
+  $('.lb-prev', box).addEventListener('click', () => show(at - 1));
+  $('.lb-next', box).addEventListener('click', () => show(at + 1));
+  box.addEventListener('click', (e) => { if (e.target === box) close(); });
+  document.addEventListener('keydown', (e) => {
+    if (box.hidden) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowLeft') show(at - 1);
+    if (e.key === 'ArrowRight') show(at + 1);
+  });
+  let touchX = null;
+  box.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; }, { passive: true });
+  box.addEventListener('touchend', (e) => {
+    if (touchX == null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 50) show(at + (dx < 0 ? 1 : -1));
+    touchX = null;
+  });
 
   // ---- routing ------------------------------------------------------------------------------
   let data;
@@ -179,6 +260,7 @@
     else if (hash === 'profile') { view = profileView(data); nav = 'profile'; }
     if (!view) view = gridView(data);
     $$('[data-nav]').forEach((a) => a.classList.toggle('active', a.dataset.nav === nav));
+    if (!box.hidden) close();
     $('[data-view]').replaceChildren(view);
     animate(view);
     window.scrollTo(0, 0);

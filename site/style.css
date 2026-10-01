@@ -151,8 +151,12 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 
 /* ---- project page: full-width pictures, then title beside the description ---- */
 .stack { display: grid; gap: 16px; padding-top: 20px; }
-.shot { position: relative; aspect-ratio: 3 / 2; background: color-mix(in srgb, var(--c) 16%, var(--tile)); overflow: hidden; }
-.shot img { width: 100%; height: 100%; object-fit: contain; }
+.shot { position: relative; overflow: hidden; background: var(--tile); }
+.shot img { width: 100%; height: auto; }
+.shot.model { aspect-ratio: 3 / 2; background: color-mix(in srgb, var(--c) 14%, var(--tile)); }
+.shot[data-zoom] { cursor: zoom-in; }
+.shot[data-zoom] img { transition: transform .7s cubic-bezier(.2, .7, .2, 1); }
+.shot[data-zoom]:hover img { transform: scale(1.015); }
 .shot.dark { background: #12100c; }
 .shot.cover img { object-fit: cover; }
 .shot.model .viewer { position: absolute; inset: 0; }
@@ -161,7 +165,55 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
   color: var(--on); background: var(--c); padding: 5px 10px; border-radius: 999px; pointer-events: none;
 }
 
-.about { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 24px 64px; margin-top: 88px; }
+/* Project page: a hero picture, the text, then rows of pictures at their own shapes, each captioned. */
+.hero-shot { padding-top: 20px; }
+.hero-shot .fig { max-width: none; }
+.gallery { display: grid; gap: 56px; margin-top: 96px; }
+.row { display: flex; gap: 20px; align-items: flex-start; }
+.row.multi .fig { flex-basis: 0; min-width: 0; }
+.row:not(.multi) .fig { flex-grow: 1 !important; }
+.fig { margin: 0; flex: 1 1 0; min-width: 0; }
+.fig figcaption {
+  display: flex; gap: 12px; margin-top: 12px; font-size: 14px; line-height: 1.45; color: var(--muted); max-width: 620px;
+}
+.fig-num { font-family: var(--serif); font-style: italic; font-size: 17px; line-height: 1.1; color: var(--c); flex: none; }
+/* IA sample pages: three paper sheets on the project's colour. */
+.row.pages { background: color-mix(in srgb, var(--c) 22%, var(--bg)); padding: clamp(24px, 4vw, 56px); }
+.sheets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2.4vw, 36px); align-items: start; }
+.sheet {
+  all: unset; display: flex; flex-direction: column; gap: 12px; cursor: zoom-in; position: relative;
+}
+.sheet img {
+  width: 100%; height: auto; background: #fff;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .06), 0 18px 40px -18px rgba(0, 0, 0, .45);
+  transition: transform .45s cubic-bezier(.2, .7, .2, 1), box-shadow .45s;
+}
+.sheet:nth-child(1) img { transform: rotate(-1.2deg); }
+.sheet:nth-child(3) img { transform: rotate(1deg); }
+.sheet:hover img, .sheet:focus-visible img { transform: translateY(-6px) rotate(0); box-shadow: 0 1px 0 rgba(0, 0, 0, .06), 0 28px 50px -20px rgba(0, 0, 0, .5); }
+.sheet:focus-visible { outline: 2px solid var(--fg); outline-offset: 6px; }
+.sheet-label { font-size: 20px; text-align: center; }
+.fig-pages figcaption { color: var(--fg); }
+
+/* The picture viewer. */
+.lightbox {
+  position: fixed; inset: 0; z-index: 60; display: grid; grid-template-columns: 64px minmax(0, 1fr) 64px; align-items: center;
+  background: color-mix(in srgb, #0f0d0a 94%, transparent); color: #f1ebdf; padding: 24px 12px;
+}
+.lightbox[hidden] { display: none; }
+.lb-fig { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 14px; max-height: 100%; min-height: 0; }
+.lb-fig img { max-width: 100%; max-height: calc(100vh - 140px); width: auto; height: auto; object-fit: contain; background: #fff; }
+.lb-fig figcaption { display: flex; gap: 14px; font-size: 15px; max-width: 760px; text-align: left; color: #d9d0bf; }
+.lb-count { font-family: var(--serif); font-style: italic; color: #f1ebdf; white-space: nowrap; }
+.lightbox button { all: unset; box-sizing: border-box; cursor: pointer; font-size: 28px; line-height: 1; text-align: center; padding: 14px; color: #f1ebdf; border-radius: 999px; }
+.lightbox button:hover, .lightbox button:focus-visible { background: rgba(241, 235, 223, .12); }
+.lightbox .lb-close { position: absolute; top: 14px; right: 18px; font-size: 34px; }
+.lightbox .lb-prev { grid-column: 1; }
+.lightbox .lb-next { grid-column: 3; }
+.lb-fig { grid-column: 2; grid-row: 1; }
+html.lb-open { overflow: hidden; }
+
+.about { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 24px 64px; margin-top: 72px; }
 .about-head { display: flex; flex-direction: column; align-items: flex-start; }
 .big-num {
   font-family: var(--serif); font-style: italic; font-size: clamp(96px, 13vw, 200px); line-height: .8;
@@ -222,12 +274,12 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 .now li::before { content: counter(now, decimal-leading-zero); font-family: var(--serif); font-style: italic; font-size: 22px; color: var(--accent); }
 
 /* ---- motion: added by app.js only when the reader has not asked for reduced motion ---- */
-.motion .shot, .motion .tile, .motion .about, .motion .next, .motion .thumb, .motion .now, .motion .hero {
+.motion .shot, .motion .fig, .motion .tile, .motion .about, .motion .next, .motion .thumb, .motion .now, .motion .hero {
   opacity: 0; transform: translateY(28px);
   transition: opacity .9s cubic-bezier(.2, .7, .2, 1), transform .9s cubic-bezier(.2, .7, .2, 1);
 }
 .motion .swatch { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s cubic-bezier(.2, .7, .2, 1), flex-grow .45s cubic-bezier(.2, .7, .2, 1); }
-.motion .in { opacity: 1; transform: none; }
+.motion .in, .motion .fig .shot { opacity: 1; transform: none; }
 .motion .statement { animation: rise 1.1s cubic-bezier(.2, .7, .2, 1) both; }
 .motion .intro { animation: rise 1.1s .25s cubic-bezier(.2, .7, .2, 1) both; }
 @keyframes rise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
@@ -255,6 +307,12 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
   .col { display: contents; }   /* one column in the original order */
   .col:nth-child(2) { margin-top: 0; }
   .about, .now { grid-template-columns: 1fr; gap: 18px; margin-top: 52px; }
+  .gallery { gap: 36px; margin-top: 64px; }
+  .row { flex-direction: column; gap: 36px; }
+  .row.multi .fig { flex-basis: auto; width: 100%; }
+  .sheets { gap: 10px; }
+  .sheet-label { font-size: 15px; }
+  .lightbox { grid-template-columns: 44px minmax(0, 1fr) 44px; padding: 16px 4px; }
   .next { grid-template-columns: 1fr; }
   .next a + a { border-left: 0; border-top: 1px solid var(--fg); }
   .thumbs { grid-template-columns: repeat(2, minmax(0, 1fr)); }

@@ -45,15 +45,30 @@ def figure(doc, name):
     save(render_plate(page, box), f'{name}.jpg')
 
 
+# Sample pages for the Beginning / Middle / End row: (page index, label).
+PAGES = [(2, 'beginning'), (15, 'middle'), (24, 'end')]
+
+
+def render_pages(doc, pages, folder):
+    """Render whole IA pages at 150 dpi. Only pages without the title page's candidate code are allowed."""
+    folder.mkdir(parents=True, exist_ok=True)
+    for i, label in pages:
+        page = doc[i]
+        text = page.get_text().lower()
+        assert 'candidate' not in text and 'lyw096' not in text and 'justin' not in text.replace('adjusting', ''), i
+        pix = page.get_pixmap(dpi=150)
+        im = Image.frombytes('RGB', (pix.width, pix.height), pix.samples)
+        im.save(folder / f'{label}.jpg', quality=85, optimize=True)
+        print(f'{folder.relative_to(ROOT)}/{label}.jpg', im.size)
+
+
 def render_plate(page, box):
-    """Render a region of a PDF page at 300 dpi, centred on a white 3:2 plate."""
+    """Render a region of a PDF page at 300 dpi with an even white margin, keeping the drawing's own shape."""
     pix = page.get_pixmap(clip=pymupdf.Rect(*box), dpi=300)
     im = Image.frombytes('RGB', (pix.width, pix.height), pix.samples)
-    w, h = im.size
-    W3, H3 = max(w, round(h * 1.5)), max(h, round(w / 1.5))
-    W3, H3 = round(W3 * 1.08), round(H3 * 1.08)          # a little white space around each drawing
-    plate = Image.new('RGB', (W3, H3), 'white')
-    plate.paste(im, ((W3 - w) // 2, (H3 - h) // 2))
+    m = round(0.06 * max(im.size))
+    plate = Image.new('RGB', (im.width + 2 * m, im.height + 2 * m), 'white')
+    plate.paste(im, (m, m))
     return plate
 
 
@@ -77,6 +92,7 @@ def main(pdf):
     doc = pymupdf.open(pdf)
     for name in FIGURES:
         figure(doc, name)
+    render_pages(doc, PAGES, ROOT / 'media' / 'physics' / 'pages')
 
 
 if __name__ == '__main__':
