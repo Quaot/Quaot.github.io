@@ -298,6 +298,8 @@
     if (!reveal) return;
     root.classList.add('motion');
     $$('.shot, .tile, .about, .swatch, .next, .thumb, .now, .fig, .stat, .shelf-item, .tl-item, .pf-skills, .pf-cta', root).forEach((el, k) => {
+      // Already on the first screen: show it straight away (a fade there only delays the page's first look).
+      if (el.getBoundingClientRect().top < innerHeight) { el.classList.add('in'); return; }
       if (el.classList.contains('swatch')) el.style.transitionDelay = `${(k % 12) * 45}ms`;
       reveal.observe(el);
     });

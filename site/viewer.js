@@ -74,7 +74,7 @@
   }
   for (const [type, fn] of wakeEvents) addEventListener(type, fn, { passive: true });
   const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 1));
-  const idleWake = () => setTimeout(() => idle(wake, { timeout: 2000 }), 2500);
+  const idleWake = () => setTimeout(() => idle(wake, { timeout: 2000 }), 6000);   // untouched pages wait a little longer
   if (document.readyState === 'complete') idleWake(); else addEventListener('load', idleWake, { once: true });
 
   function start(el) {
