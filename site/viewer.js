@@ -141,6 +141,7 @@
     scene.add(key);
 
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    renderer.domElement.style.touchAction = 'pan-y';   // vertical swipes scroll the page (see style.css)
     controls.enableDamping = true;
     controls.enablePan = false;
     controls.autoRotate = true;
