@@ -174,6 +174,10 @@ def main():
         for url, _ in out:
             shutil.copy2(CACHE / url[len("/"):], SITE / url[len("/"):])
         images["/" + src] = {"w": w, "h": h, "set": out}
+    for src in sorted(x for x in pictures if x and x.lower().endswith(".svg")):
+        m = re.search(r'viewBox="[\d.\s-]*?([\d.]+)\s+([\d.]+)"', (ROOT / src).read_text(encoding="utf-8"))
+        if m:   # drawings scale freely; their size only stops the page from jumping as they arrive
+            images["/" + src] = {"w": round(float(m.group(1))), "h": round(float(m.group(2))), "set": []}
 
     out = absolute(dict(site))
     out["categories"] = absolute(categories)

@@ -170,7 +170,7 @@
   // ---- one project: pictures first, then title and description, then the rest ---------------
   function shot(m, { eager, sizes, poster } = {}) {
     if (is3D(m)) {
-      return h('div', { class: 'shot model' }, viewer(m, '', poster), h('span', { class: 'hint', 'aria-hidden': 'true' }, 'Drag to rotate'));
+      return h('div', { class: 'shot model' }, viewer(m, '', poster, '3x2'), h('span', { class: 'hint', 'aria-hidden': 'true' }, 'Drag to rotate'));
     }
     return h('div', { class: 'shot' + (m.dark ? ' dark' : '') + (m.fit ? ' ' + m.fit : ''), 'data-zoom': '' },
       pic(m.src, { alt: m.alt || '', eager, sizes, caption: m.caption || '' }));

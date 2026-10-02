@@ -53,6 +53,7 @@ body::after {
 :focus-visible { outline: 2px solid var(--fg); outline-offset: 4px; }
 .tile:focus-visible, .thumb:focus-visible, .shelf-item:focus-visible, .swatch:focus-visible { outline-offset: 6px; }
 main:focus { outline: none; }
+main { min-height: 100vh; min-height: 100svh; }   /* the footer starts below the fold, so it doesn't jump when the page fills in */
 ::selection { background: var(--accent); color: #f6f0e4; }
 a { color: inherit; text-decoration: none; }
 img { display: block; max-width: 100%; }

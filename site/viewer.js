@@ -8,8 +8,9 @@
 // - Small views (home tiles, thumbnails, the profile shelf, class "still") show a picture of the model, made
 //   ahead of time by scripts/render_web_stills.mjs (light and dark). They come alive while hovered (or, on
 //   phones, while centred on screen) and go back to a picture after. Without a ready-made picture, one is drawn.
-// - The home-page board shows its ready-made picture at once and starts the live model on the first scroll,
-//   pointer move, touch or key press, or once the page has been idle a moment.
+// - Interactive views (the home-page board, models on project pages) show their ready-made picture at once and
+//   start the live model after the first scroll, pointer move, touch or key press, or once the page has been
+//   idle a moment, so a page is quick to load and respond before any 3D work begins.
 // - Any viewer that scrolls well out of sight turns back into a picture and frees its WebGL context, and no more
 //   than LIVE_MAX of them (besides the hero) run at once.
 // - A context the browser drops is rebuilt; a model that fails to download is retried, then a picture is shown.
@@ -58,6 +59,23 @@
   const madePicture = (el) => el.dataset[dark() ? 'stillDark' : 'stillLight'];
 
   const live = new Set();   // running viewers other than the hero, oldest first
+
+  let awake = false;
+  const waiting = [];
+  const whenAwake = (fn) => { if (awake) fn(); else waiting.push(fn); };
+  const wakeEvents = ['scroll', 'pointermove', 'pointerdown', 'touchstart', 'keydown', 'wheel']
+    // A real scroll only: the page itself jumps to the top when a view is drawn.
+    .map((type) => [type, () => { if (type !== 'scroll' || scrollY > 40) wake(); }]);
+  function wake() {
+    if (awake) return;
+    awake = true;
+    for (const [type, fn] of wakeEvents) removeEventListener(type, fn);
+    waiting.splice(0).forEach((fn) => fn());
+  }
+  for (const [type, fn] of wakeEvents) addEventListener(type, fn, { passive: true });
+  const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 1));
+  const idleWake = () => setTimeout(() => idle(wake, { timeout: 2000 }), 2500);
+  if (document.readyState === 'complete') idleWake(); else addEventListener('load', idleWake, { once: true });
 
   function start(el) {
     if (el._v) return;
@@ -518,6 +536,13 @@
           host.addEventListener('pointerenter', () => setActive(el, true));
           host.addEventListener('pointerleave', () => setActive(el, false));
         }
+        el._near = true;
+        if (!still) {
+          const made = madePicture(el);
+          if (made && !el._pictured && !el._v) { el._pictured = true; showPicture(el, made); }
+          whenAwake(() => { if (el._near && !el._v && el.isConnected) start(el); });
+          continue;
+        }
         if (still) {
           const cached = snaps.get(snapKey(el)), made = madePicture(el);
           if (made && !el._pictured) {
@@ -525,8 +550,11 @@
             showPicture(el, made, () => { if (!el._v) start(el); });   // missing file: draw one instead
           } else if (cached) showPicture(el, cached);
           else if (!el._v && !made) start(el);   // draw it once to get its picture
-        } else if (!el._v) start(el);
-      } else if (el._v?.release && !el._hero) el._v.release();
+        }
+      } else {
+        el._near = false;
+        if (el._v?.release && !el._hero) el._v.release();
+      }
     }
   }, { rootMargin: '400px 0px' });
 
@@ -555,19 +583,9 @@
       if (el._hero) {   // the hero never turns back into a picture once it is live
         const made = el.dataset[innerWidth < 700 ? 'stillNarrow' : 'stillWide'];
         if (made) showPicture(el, made);
-        let go = () => {
-          go = () => {};
-          for (const [type, fn] of wake) removeEventListener(type, fn);
-          new IntersectionObserver((e, o) => { if (e[0].isIntersecting) { o.disconnect(); if (el.isConnected) start(el); } },
-            { rootMargin: '200px' }).observe(el);
-        };
-        // A real scroll only: the page itself jumps to the top when a view is drawn.
-        const wake = ['scroll', 'pointermove', 'pointerdown', 'touchstart', 'keydown', 'wheel']
-          .map((type) => [type, () => { if (type !== 'scroll' || scrollY > 40) go(); }]);
-        for (const [type, fn] of wake) addEventListener(type, fn, { passive: true });
-        const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 1));
-        addEventListener('load', () => setTimeout(() => idle(() => go(), { timeout: 2000 }), 2500), { once: true });
-        if (document.readyState === 'complete') setTimeout(() => idle(() => go(), { timeout: 2000 }), 2500);
+        whenAwake(() => new IntersectionObserver((e, o) => {
+          if (e[0].isIntersecting) { o.disconnect(); if (el.isConnected) start(el); }
+        }, { rootMargin: '200px' }).observe(el));
         return;
       }
       near.observe(el);

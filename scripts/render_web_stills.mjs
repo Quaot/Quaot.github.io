@@ -5,7 +5,8 @@
 //   chrome --headless=new --remote-debugging-port=9336     (any Chrome or Edge, in another)
 //   node scripts/render_web_stills.mjs [port]
 //
-// Writes media/stills/<model>.<shape>.<theme>.webp for every 3D cover (4x3) and profile shelf item (4x5),
+// Writes media/stills/<model>.<shape>.<theme>.webp for every 3D cover (4x3), project-page model (3x2) and
+// profile shelf item (4x5),
 // and media/stills/hero.wide.webp / hero.narrow.webp for the home-page board at rest. Run it again after
 // changing a model, then build.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -27,6 +28,13 @@ for (const c of data.categories) {
   for (const p of c.projects) {
     const m = (p.media || [])[0];
     if (!(p.cover || {}).src && m && (m.type === 'stl' || m.type === 'glb')) jobs.set(`${m.src}|4x3`, { src: m.src, type: m.type, shape: '4x3', w: 640, h: 480 });
+  }
+}
+for (const c of data.categories) {   // every model on a project page, shown as a picture until the page wakes
+  for (const p of c.projects) {
+    for (const m of p.media || []) {
+      if (m.type === 'stl' || m.type === 'glb') jobs.set(`${m.src}|3x2`, { src: m.src, type: m.type, shape: '3x2', w: 720, h: 480 });
+    }
   }
 }
 for (const it of (data.profile || {}).shelf || []) jobs.set(`${it.src}|4x5`, { src: it.src, type: it.type, shape: '4x5', w: 400, h: 500 });
