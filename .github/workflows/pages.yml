@@ -1,4 +1,5 @@
-# Builds the site from data/ and publishes site/ to GitHub Pages on every push to main.
+# Builds the site from data/, checks every page (scripts/smoke.mjs), and publishes site/ to GitHub Pages
+# on every push to main. Nothing is published if a page fails the check.
 name: Deploy site
 
 on:
@@ -27,7 +28,20 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install pyyaml pillow
+      # The WebP copies of every picture only change when a picture does.
+      - uses: actions/cache@v4
+        with:
+          path: .cache/variants
+          key: variants-${{ hashFiles('media/**/*.jpg', 'media/**/*.jpeg', 'media/**/*.png') }}
+          restore-keys: variants-
       - run: python scripts/build.py
+      # Every page, at desktop and phone size, light and dark: no errors, nothing broken, within the budget.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/smoke.mjs
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
