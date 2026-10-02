@@ -2,35 +2,110 @@
 // type 'layers' is a GLB of stacked board layers that slowly pull apart and close again.
 // With hero options (STLViewer.hero) the layers follow the page's scroll instead, tilt toward the cursor,
 // name themselves on labels, lift when pointed at, and carry pulses of current along the real tracks.
-// Viewers only start once they scroll into view, and stop rendering when hidden.
+//
+// Keeping it light:
+// - three.js is fetched only when the first model is about to be shown, with only the loader that model needs.
+// - Small views (home tiles, thumbnails, the profile shelf, class "still") show a rendered picture of the model.
+//   They come alive while hovered (or, on phones, while centred on screen) and go back to a picture after.
+// - Any viewer that scrolls well out of sight turns back into a picture and frees its WebGL context, and no more
+//   than LIVE_MAX of them (besides the hero) run at once.
+// - A context the browser drops is rebuilt; a model that fails to download is retried, then a picture is shown.
 (function () {
+  const CDN = 'https://cdn.jsdelivr.net/npm/three@0.128.0/';
+  const LIVE_MAX = 3;
+  const scripts = {};
+  const script = (url) => scripts[url] || (scripts[url] = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = url;
+    s.onload = resolve;
+    s.onerror = () => { delete scripts[url]; reject(new Error(url)); };
+    document.head.append(s);
+  }));
+  async function three(type) {
+    await script(`${CDN}build/three.min.js`);
+    await Promise.all([
+      script(`${CDN}examples/js/controls/OrbitControls.js`),
+      script(`${CDN}examples/js/loaders/${type === 'stl' ? 'STLLoader' : 'GLTFLoader'}.js`),
+    ]);
+  }
+
   function cssVar(name) {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
+  const dark = () => document.documentElement.dataset.theme === 'dark'
+    || (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
 
-  function mount(el, src, type) {
-    if (el._viewer) return;
+  // Pictures of models already drawn, so a model is only ever rendered once per size and theme.
+  const snaps = new Map();
+  const snapKey = (el) => `${el.dataset.stl}|${dark() ? 'd' : 'l'}|${Math.round(el.clientWidth / 40)}x${Math.round(el.clientHeight / 40)}`;
+  function showPicture(el, url) {
+    let img = el.querySelector(':scope > img.snap');
+    if (!img) {
+      img = document.createElement('img');
+      img.className = 'snap';
+      img.alt = '';
+      img.decoding = 'async';
+      el.prepend(img);
+    }
+    img.src = url;
+    img.style.visibility = '';
+  }
+
+  const live = new Set();   // running viewers other than the hero, oldest first
+
+  function start(el) {
+    if (el._v) return;
+    el._v = { starting: true };
+    if (!el._hero) {
+      if (live.size >= LIVE_MAX) [...live][0]._v?.release?.();   // make room: the oldest goes back to a picture
+    }
+    three(el.dataset.type).then(() => { if (el.isConnected) mount(el); else el._v = null; }, () => {
+      el._v = null;
+      fallback(el);
+    });
+  }
+
+  function fallback(el) {
+    const poster = el.dataset.poster;
+    if (poster) showPicture(el, poster);
+    else if (!el.querySelector('img.snap')) el.textContent = '3D view unavailable';
+  }
+
+  function mount(el) {
+    const src = el.dataset.stl, type = el.dataset.type;
     const hero = el._hero;   // { progress(), labels: {layer name: element}, leaders: <svg>, traces: url }
-    el._viewer = true;
+    const still = el.classList.contains('still');
     const loading = document.createElement('div');
     loading.className = 'loading label';
     loading.textContent = 'Loading model';
-    el.appendChild(loading);
+    if (!el.querySelector('img.snap')) el.appendChild(loading);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    } catch (e) {
+      loading.remove();
+      el._v = null;
+      fallback(el);
+      return;
+    }
     el.appendChild(renderer.domElement);
+    renderer.domElement.style.opacity = '0';   // the picture stays on top until the first live frame is drawn
+    const state = el._v = { alive: true, ready: false, releasing: false, snapOnly: still && !el._active };
+    if (!hero) live.add(el);
+
     // Browsers drop WebGL contexts under GPU pressure, after a tab sits in the background, or when a page comes
     // back from the back/forward cache. A dropped context leaves a blank canvas, so start this viewer again.
-    let alive = true;
     renderer.domElement.addEventListener('webglcontextlost', (e) => {
       e.preventDefault();
-      if (!alive) return;
-      alive = false;
+      if (!state.alive) return;
+      state.alive = false;
+      live.delete(el);
       setTimeout(() => {
         if (!el.isConnected) return;
-        el.replaceChildren();
-        el._viewer = false;
-        mount(el, src, type);
+        renderer.domElement.remove();
+        el._v = null;
+        if (hero || !still || el._active) start(el);
       }, 250);
     });
 
@@ -82,11 +157,9 @@
         for (const k of [key(x1, z1), key(x2, z2)]) ends.set(k, [...(ends.get(k) || []), i]);
       });
       const used = new Set(), paths = [];
-      const walk = (i, fromStart) => {
-        const pts = [];
-        let [x1, z1, x2, z2] = segments[i];
-        if (!fromStart) [x1, z1, x2, z2] = [x2, z2, x1, z1];
-        pts.push([x1, z1], [x2, z2]);
+      const walk = (i) => {
+        const [x1, z1, x2, z2] = segments[i];
+        const pts = [[x1, z1], [x2, z2]];
         used.add(i);
         for (;;) {
           const [x, z] = pts[pts.length - 1];
@@ -103,7 +176,7 @@
         const [a, b] = segments[i], [c, d] = segments[j];
         return (deg(key(a, b)) === 2) - (deg(key(c, d)) === 2);
       });
-      for (const i of order) if (!used.has(i)) paths.push(walk(i, true));
+      for (const i of order) if (!used.has(i)) paths.push(walk(i));
       return paths;
     }
 
@@ -174,9 +247,6 @@
         current = material;
       }).catch(() => {});
     }
-    function stepCurrent(t) {
-      if (current) current.uniforms.uTime.value = t;
-    }
 
     // Labels: each layer's name sits in a column to the right, joined to the layer's edge by a thin line.
     const anchor = new THREE.Vector3();
@@ -203,16 +273,31 @@
       hero.leaders.style.opacity = show;
     }
 
-    if (hero) {
+    if (hero && !el._wired) {
+      el._wired = true;   // listeners survive a rebuilt viewer, so they read the current one through el._input
+      const input = el._input = { aimX: 0, aimY: 0, pointer: { x: 9, y: 9 }, down: null, up: null };
       window.addEventListener('pointermove', (e) => {
         const r = el.getBoundingClientRect();
-        pointer.set((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
-        aimX = Math.max(-1, Math.min(1, pointer.x));
-        aimY = Math.max(-1, Math.min(1, pointer.y));
+        input.pointer.x = (e.clientX - r.left) / r.width * 2 - 1;
+        input.pointer.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+        input.aimX = Math.max(-1, Math.min(1, input.pointer.x));
+        input.aimY = Math.max(-1, Math.min(1, input.pointer.y));
       }, { passive: true });
-      el.addEventListener('pointerleave', () => { if (!drag) { pointer.set(9, 9); aimX = aimY = 0; } });
+      el.addEventListener('pointerleave', () => { if (!el.classList.contains('dragging')) { input.pointer.x = input.pointer.y = 9; input.aimX = input.aimY = 0; } });
+      el.addEventListener('pointerdown', (e) => input.down?.(e));
+      el.addEventListener('pointerup', () => input.up?.());
+      el.addEventListener('pointercancel', () => input.up?.());   // e.g. a phone turned the gesture into a scroll
+      // Phones: tilt the phone to tilt the board, where the browser allows it without asking.
+      window.addEventListener('deviceorientation', (e) => {
+        if (e.gamma == null) return;
+        input.aimX = Math.max(-1, Math.min(1, e.gamma / 30));
+        input.aimY = Math.max(-1, Math.min(1, (e.beta - 45) / 30));
+      }, { passive: true });
+    }
+    if (hero) {
+      const input = el._input;
       // Grab a layer and it comes out with the pointer, then springs back into the stack when let go.
-      el.addEventListener('pointerdown', (e) => {
+      input.down = (e) => {
         if (!heroModel || e.button > 0) return;
         const r = el.getBoundingClientRect();
         pointer.set((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
@@ -228,92 +313,85 @@
         hovered = node;
         el.setPointerCapture(e.pointerId);
         el.classList.add('dragging');
-      });
-      const release = () => { drag = null; el.classList.remove('dragging'); };
-      el.addEventListener('pointerup', release);
-      el.addEventListener('pointercancel', release);   // e.g. a phone turned the gesture into a scroll
-      // Phones: tilt the phone to tilt the board, where the browser allows it without asking.
-      window.addEventListener('deviceorientation', (e) => {
-        if (e.gamma == null) return;
-        aimX = Math.max(-1, Math.min(1, e.gamma / 30));
-        aimY = Math.max(-1, Math.min(1, (e.beta - 45) / 30));
-      }, { passive: true });
+      };
+      input.up = () => { drag = null; el.classList.remove('dragging'); };
     }
 
     function frame(r) {
       loading.remove();
       const aspect = el.clientWidth / (el.clientHeight || 1);
       if (aspect < 1) r *= Math.pow(1 / aspect, 0.8);   // tall boxes (the profile shelf): step back so it fits across
-
       camera.position.set(r * 2.1, r * 1.5, r * 2.6);
       controls.target.set(0, 0, 0);
       controls.minDistance = r * 1.4;
       controls.maxDistance = r * 8;
       controls.update();
     }
-    // A model that fails to download is tried twice more before saying so.
+    // A model that fails to download is tried twice more, then a picture (if there is one) stands in.
     let tries = 0;
     const failed = () => {
-      if (tries++ < 2 && el.isConnected && alive) setTimeout(load, 900 * tries);
-      else loading.textContent = 'Model failed to load';
+      if (tries++ < 2 && el.isConnected && state.alive) setTimeout(load, 900 * tries);
+      else { loading.remove(); fallback(el); }
     };
 
     function load() {
-    if (type === 'glb' || type === 'layers') {
-      // Textured model (e.g. a PCB), already Y-up and centred. Keep its own colours.
-      renderer.outputEncoding = THREE.sRGBEncoding;
-      new THREE.GLTFLoader().load(src, (gltf) => {
-        const model = gltf.scene;
-        const meshes = [];
-        model.traverse((o) => { if (o.isMesh) meshes.push(o); });
-        for (const o of meshes) {
-          o.material.polygonOffset = true;
-          o.material.polygonOffsetFactor = 1;
-          o.material.polygonOffsetUnits = 1;
-          if (o.material.transparent) o.material.depthWrite = false;   // stacked see-through layers
-          o.add(outline(o.geometry));   // child, so it follows the mesh's transform
-        }
-        if (type === 'layers') {
-          layers = model.children.map((n) => [n, n.position.y]);
-          controls.autoRotateSpeed = 0.6;
-        }
-        if (hero) {
-          stage = new THREE.Group();
-          stage.add(model);
-          scene.add(stage);
-          heroModel = model;
-          if (hero.traces) addCurrent(model, hero.traces);
-        } else {
-          scene.add(model);
-        }
-        const sphere = new THREE.Box3().setFromObject(model).getBoundingSphere(new THREE.Sphere());
-        model.position.sub(sphere.center);
-        frame(sphere.radius * (type === 'layers' ? 1.15 : 0.9));   // flat boards look lost in a full bounding-sphere frame
-        if (hero) {
-          size = new THREE.Box3().setFromObject(layers[0][0]).getSize(new THREE.Vector3());
-          // Pull back further on tall, narrow screens so the whole stack fits with room for the labels,
-          // and on phones aim right of the board so it sits left of the label column.
-          const aspect = el.clientWidth / el.clientHeight;
-          const back = 3.3 * Math.pow(Math.max(1, 1.3 / aspect), 0.8);
-          const narrow = el.clientWidth < 700;
-          camera.position.set(narrow ? sphere.radius * 0.3 : 0, sphere.radius * back * 0.95, sphere.radius * back);
-          controls.target.set(narrow ? sphere.radius * 0.3 : 0, sphere.radius * 0.18, 0);   // a little low, clear of the header
-          controls.update();
-        }
-      }, undefined, failed);
-    } else {
-      new THREE.STLLoader().load(src, (geometry) => {
-        geometry.rotateX(-Math.PI / 2);   // CAD files are Z-up, three.js is Y-up
-        geometry.center();
-        geometry.computeBoundingSphere();
-        const body = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
-          color: new THREE.Color(cssVar('--model') || '#d8dde3'),
-          roughness: 0.75, metalness: 0.05, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1,
-        }));
-        scene.add(body, outline(geometry));
-        frame(geometry.boundingSphere.radius);
-      }, undefined, failed);
-    }
+      if (type === 'glb' || type === 'layers') {
+        // Textured model (e.g. a PCB), already Y-up and centred. Keep its own colours.
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        new THREE.GLTFLoader().load(src, (gltf) => {
+          const model = gltf.scene;
+          const meshes = [];
+          model.traverse((o) => { if (o.isMesh) meshes.push(o); });
+          for (const o of meshes) {
+            o.material.polygonOffset = true;
+            o.material.polygonOffsetFactor = 1;
+            o.material.polygonOffsetUnits = 1;
+            if (o.material.transparent) o.material.depthWrite = false;   // stacked see-through layers
+            o.add(outline(o.geometry));   // child, so it follows the mesh's transform
+          }
+          if (type === 'layers') {
+            layers = model.children.map((n) => [n, n.position.y]);
+            controls.autoRotateSpeed = 0.6;
+          }
+          if (hero) {
+            stage = new THREE.Group();
+            stage.add(model);
+            scene.add(stage);
+            heroModel = model;
+            if (hero.traces) addCurrent(model, hero.traces);
+          } else {
+            scene.add(model);
+          }
+          const sphere = new THREE.Box3().setFromObject(model).getBoundingSphere(new THREE.Sphere());
+          model.position.sub(sphere.center);
+          frame(sphere.radius * (type === 'layers' ? 1.15 : 0.9));   // flat boards look lost in a full bounding-sphere frame
+          if (hero) {
+            size = new THREE.Box3().setFromObject(layers[0][0]).getSize(new THREE.Vector3());
+            // Pull back further on tall, narrow screens so the whole stack fits with room for the labels,
+            // and on phones aim right of the board so it sits left of the label column.
+            const aspect = el.clientWidth / el.clientHeight;
+            const back = 3.3 * Math.pow(Math.max(1, 1.3 / aspect), 0.8);
+            const narrow = el.clientWidth < 700;
+            camera.position.set(narrow ? sphere.radius * 0.3 : 0, sphere.radius * back * 0.95, sphere.radius * back);
+            controls.target.set(narrow ? sphere.radius * 0.3 : 0, sphere.radius * 0.18, 0);   // a little low, clear of the header
+            controls.update();
+          }
+          state.ready = true;
+        }, undefined, failed);
+      } else {
+        new THREE.STLLoader().load(src, (geometry) => {
+          geometry.rotateX(-Math.PI / 2);   // CAD files are Z-up, three.js is Y-up
+          geometry.center();
+          geometry.computeBoundingSphere();
+          const body = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
+            color: new THREE.Color(cssVar('--model') || '#d8dde3'),
+            roughness: 0.75, metalness: 0.05, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1,
+          }));
+          scene.add(body, outline(geometry));
+          frame(geometry.boundingSphere.radius);
+          state.ready = true;
+        }, undefined, failed);
+      }
     }
     load();
 
@@ -327,25 +405,50 @@
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
     }
-    new ResizeObserver(resize).observe(el);
-    matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`).addEventListener('change', resize, { once: true });   // moved to another screen
+    const resizer = new ResizeObserver(resize);
+    resizer.observe(el);
     resize();
 
     let visible = true;
-    new IntersectionObserver((e) => { visible = e[0].isIntersecting; }).observe(el);
+    const seen = new IntersectionObserver((e) => { visible = e[0].isIntersecting; });
+    seen.observe(el);
+
+    // Back to a picture: draw one last frame, keep it as an image, and give the context back.
+    function dispose() {
+      state.alive = false;
+      live.delete(el);
+      resizer.disconnect();
+      seen.disconnect();
+      controls.dispose();
+      renderer.dispose();
+      renderer.forceContextLoss();
+      renderer.domElement.remove();
+      if (el._v === state) el._v = null;
+    }
+    state.release = () => { state.releasing = true; if (!state.ready) dispose(); };
+
+    let first = true;
     (function loop() {
-      if (!alive) return;      // the context was lost: a fresh viewer has taken over
-      if (!el.isConnected) {   // its page was replaced: free the GL context
-        alive = false;
-        controls.dispose();
-        renderer.dispose();
-        renderer.forceContextLoss();
+      if (!state.alive) return;          // the context was lost: a fresh viewer has taken over
+      if (!el.isConnected) { dispose(); return; }   // its page was replaced
+      if (state.releasing || (state.snapOnly && state.ready)) {
+        controls.update();
+        renderer.render(scene, camera);
+        try {
+          const url = renderer.domElement.toDataURL('image/webp', 0.9);
+          snaps.set(snapKey(el), url);
+          showPicture(el, url);
+        } catch (e) { /* a picture is a nicety; the model was already shown */ }
+        dispose();
         return;
       }
       requestAnimationFrame(loop);
       if (!visible) return;
       const t = performance.now() / 1000;
       if (hero && layers.length && stage) {
+        const input = el._input;
+        pointer.set(input.pointer.x, input.pointer.y);
+        aimX = input.aimX; aimY = input.aimY;
         const p = Math.max(0, Math.min(1, hero.progress()));
         const ease = p * p * (3 - 2 * p);
         spread += (0.1 + 1.45 * ease - spread) * 0.12;
@@ -375,38 +478,76 @@
           if (!drag || drag.node !== n) pl.lerp(zero, 0.085);   // spring back once let go
           n.position.set(pl.x, y * spread + l + pl.y, pl.z);
         }
-        stepCurrent(calm ? 0 : t);
+        if (current) current.uniforms.uTime.value = calm ? 0 : t;
         if (size) placeLabels(Math.max(0, Math.min(1, (spread - 0.45) / 0.5)).toFixed(3));
-        renderer.render(scene, camera);
-        return;
+      } else {
+        if (layers.length) {
+          const s = 0.18 + 0.82 * (0.5 - 0.5 * Math.cos(t * 0.5));
+          for (const [n, y] of layers) n.position.y = y * s;
+        }
+        controls.update();
       }
-      if (layers.length) {
-        const spread = 0.18 + 0.82 * (0.5 - 0.5 * Math.cos(t * 0.5));
-        for (const [n, y] of layers) n.position.y = y * spread;
-      }
-      controls.update();
       renderer.render(scene, camera);
+      if (first && state.ready) {
+        first = false;
+        renderer.domElement.style.opacity = '';   // the live model now covers the picture
+        const picture = el.querySelector(':scope > img.snap');
+        if (picture) picture.style.visibility = 'hidden';   // the canvas is see-through: don't show both
+      }
     })();
   }
 
-  // Start a viewer when it first comes near the screen.
-  const io = new IntersectionObserver((entries) => {
-    for (const e of entries) {
-      if (e.isIntersecting) { io.unobserve(e.target); mount(e.target, e.target.dataset.stl, e.target.dataset.type); }
+  const hoverable = matchMedia('(hover: hover)').matches;
+  // Interactive viewers start when they come near the screen and go back to a picture when far away.
+  // Still views get their picture when near, and come alive only while hovered or centred.
+  const near = new IntersectionObserver((entries) => {
+    for (const { target: el, isIntersecting } of entries) {
+      const still = el.classList.contains('still');
+      if (isIntersecting) {
+        if (still && hoverable && !el._hoverWired) {
+          // Wired here, not in watch(): by now the view sits inside its link (tile, thumbnail, shelf item).
+          el._hoverWired = true;
+          const host = el.closest('a') || el.parentElement;
+          host.addEventListener('pointerenter', () => setActive(el, true));
+          host.addEventListener('pointerleave', () => setActive(el, false));
+        }
+        if (still) {
+          const cached = snaps.get(snapKey(el));
+          if (cached) showPicture(el, cached);
+          else if (!el._v) start(el);   // draw it once to get its picture
+        } else if (!el._v) start(el);
+      } else if (el._v?.release && !el._hero) el._v.release();
     }
-  }, { rootMargin: '200px' });
+  }, { rootMargin: '400px 0px' });
+
+  const centred = new IntersectionObserver((entries) => {
+    for (const { target: el, isIntersecting } of entries) setActive(el, isIntersecting);
+  }, { rootMargin: '-38% 0px -38% 0px' });
+  function setActive(el, on) {
+    el._active = on;
+    if (on) {
+      if (el._v?.snapOnly) el._v.snapOnly = false;   // it was only drawing its picture: keep it running
+      else if (!el._v) start(el);
+    } else if (el._v?.release) el._v.release();
+  }
 
   window.STLViewer = {
     // The home-page board. options: { progress, labels, leaders, traces }, see mount().
     hero(el, src, options) {
       el._hero = options;
-      this.watch(el, src, 'layers');
+      this.watch(el, src, 'layers', { poster: options.poster });
     },
-    watch(el, src, type) {
-      if (typeof THREE === 'undefined') { el.textContent = '3D viewer unavailable'; return; }
+    watch(el, src, type, options = {}) {
       el.dataset.stl = src;
       el.dataset.type = type || 'stl';
-      io.observe(el);
+      if (options.poster) el.dataset.poster = options.poster;
+      if (el._hero) {   // the hero never turns into a picture
+        new IntersectionObserver((e, o) => { if (e[0].isIntersecting) { o.disconnect(); start(el); } },
+          { rootMargin: '200px' }).observe(el);
+        return;
+      }
+      near.observe(el);
+      if (el.classList.contains('still') && !hoverable) centred.observe(el);
     },
   };
 })();

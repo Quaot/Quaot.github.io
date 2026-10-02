@@ -6,6 +6,7 @@ intro: Circuit boards, 3D printed parts and software, shown with the *calculatio
 hero_layers:
   src: media/pcb-ldo/layers.glb
   traces: media/pcb-ldo/traces.json   # from scripts/trace_paths.py
+  poster: media/pcb-ldo/render.png     # shown if the browser can't draw 3D
   caption: The 3.3 V regulator board, separated into five of its fabrication layers. The readings are its calculated
     full-load design values.
   hint: Scroll to take it apart, or grab a layer

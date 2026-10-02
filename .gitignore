@@ -1,3 +1,8 @@
 site/data.json
 site/media/
+site/index.html
+site/404.html
+site/p/
+site/profile/
+.cache/
 __pycache__/

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<!-- The page shell. scripts/build.py fills the {{...}} slots and writes one copy per address:
+     index.html, profile/index.html, p/<id>/index.html and 404.html. Edit this file, not those. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{title}}</title>
+  <meta name="description" content="{{description}}">
+  <meta name="theme-color" content="#f1ebdf">
+  <link rel="canonical" href="{{url}}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Justin Gu">
+  <meta property="og:url" content="{{url}}">
+  <meta property="og:title" content="{{title}}">
+  <meta property="og:description" content="{{description}}">
+  <meta property="og:image" content="{{image}}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" sizes="32x32" href="/media/icon-32.png">
+  <link rel="apple-touch-icon" href="/media/icon-180.png">
+  <link rel="preload" href="/fonts/instrument-serif.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/inter-tight.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  {{preload}}
+  <link rel="stylesheet" href="/style.css?v={{v_style}}">
+  <script>window.DATA_URL = '/data.json?v={{v_data}}';</script>
+  <script defer src="/viewer.js?v={{v_viewer}}"></script>
+  <script defer src="/app.js?v={{v_app}}"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="topbar">
+    <a class="mark" href="/" data-name>Justin Gu</a>
+    <nav aria-label="Main">
+      <a href="/" data-nav="projects">Projects</a>
+      <a href="/profile/" data-nav="profile">Profile</a>
+      <a href="/media/resume.pdf" target="_blank" rel="noopener">Résumé</a>
+    </nav>
+  </header>
+
+  <main data-view id="main" tabindex="-1"></main>
+
+  <footer class="footer">
+    <p class="say">Say <em>hello</em> <span class="arrow">→</span> <span data-email></span></p>
+    <div class="footer-row">
+      <span data-name></span>
+      <span class="links" data-links></span>
+      <span class="muted">Waterloo, Ontario</span>
+    </div>
+  </footer>
+
+  <noscript><p>This page needs JavaScript to load the projects.</p></noscript>
+</body>
+</html>
