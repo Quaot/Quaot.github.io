@@ -402,6 +402,7 @@ html.lb-open { overflow: hidden; }
 .viewer.still { pointer-events: none; }   /* grid tiles: the whole tile is a link */
 .viewer canvas { position: relative; display: block; width: 100% !important; height: 100% !important; transition: opacity .25s; }
 .viewer > img.snap { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+.hero-viewer > img.snap { object-fit: cover; }
 .viewer .loading { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 14px; }
 
 @media (max-width: 760px) {

@@ -55,10 +55,17 @@
     });
   }
 
-  function viewer(m, cls, poster) {
+  // Ready-made pictures of a model (scripts/render_web_stills.mjs), named after its path:
+  // /media/pcb-ldo/board.glb at 4:3 -> /media/stills/pcb-ldo-board.4x3.light.webp (and .dark.webp).
+  const stillName = (src) => src.replace(/^\/?media\//, '').replace(/\.\w+$/, '').replace(/\//g, '-');
+  const stillsFor = (src, shape) => ({
+    light: `/media/stills/${stillName(src)}.${shape}.light.webp`, dark: `/media/stills/${stillName(src)}.${shape}.dark.webp`,
+  });
+
+  function viewer(m, cls, poster, shape) {
     const v = h('div', { class: 'viewer ' + (cls || ''), role: 'img',
       'aria-label': (m.alt || 'Interactive 3D model') + (cls === 'still' ? '' : ', drag to rotate') });
-    window.STLViewer.watch(v, m.src, m.type, { poster });
+    window.STLViewer.watch(v, m.src, m.type, { poster, stills: shape ? stillsFor(m.src, shape) : null });
     return v;
   }
 
@@ -74,7 +81,7 @@
     const c = p.cover || {};
     const m = (p.media || [])[0];
     if (c.src) return h('div', { class: 'cover' }, pic(c.src, { sizes }));
-    if (m && is3D(m)) return h('div', { class: 'cover model' }, viewer(m, 'still'));
+    if (m && is3D(m)) return h('div', { class: 'cover model' }, viewer(m, 'still', null, '4x3'));
     if (m) return h('div', { class: 'cover' + (m.dark ? ' dark' : '') }, pic(m.src, { sizes }));
     return h('div', { class: 'cover model' });
   }
@@ -139,7 +146,8 @@
       const travel = run.offsetHeight - innerHeight;
       return travel > 0 ? -r.top / travel : 0;
     };
-    window.STLViewer.hero(v, hl.src, { progress, labels, leaders, traces: hl.traces, poster: hl.poster });
+    window.STLViewer.hero(v, hl.src, { progress, labels, leaders, traces: hl.traces, poster: hl.poster,
+      stills: { wide: '/media/stills/hero.wide.webp', narrow: '/media/stills/hero.narrow.webp' } });
     // While the pinned board is under the header, the header stops blurring what is behind it.
     const pin = run.querySelector('.hero-pin');
     new IntersectionObserver(([e]) => document.documentElement.classList.toggle('over-hero', e.isIntersecting && run.isConnected),
@@ -255,7 +263,7 @@
       pr.shelf ? h('section', { class: 'pf-shelf' }, h2('Things', ' I have made'),
         h('div', { class: 'shelf' }, pr.shelf.map((it) =>
           h('a', { class: 'shelf-item', href: projectUrl(it.project), style: tint(it.project) },
-            h('div', { class: 'shelf-stage' }, viewer({ src: it.src, type: it.type, alt: it.label }, 'still')),
+            h('div', { class: 'shelf-stage' }, viewer({ src: it.src, type: it.type, alt: it.label }, 'still', null, '4x5')),
             h('span', { class: 'shelf-label' }, it.label),
             h('span', { class: 'shelf-go' }, 'View project →'))))) : null,
       textBlock([h2('The', ' longer version')], paras(d.about), [{ label: 'Résumé (PDF)', url: '/media/resume.pdf' }]),

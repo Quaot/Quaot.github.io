@@ -5,8 +5,11 @@
 //
 // Keeping it light:
 // - three.js is fetched only when the first model is about to be shown, with only the loader that model needs.
-// - Small views (home tiles, thumbnails, the profile shelf, class "still") show a rendered picture of the model.
-//   They come alive while hovered (or, on phones, while centred on screen) and go back to a picture after.
+// - Small views (home tiles, thumbnails, the profile shelf, class "still") show a picture of the model, made
+//   ahead of time by scripts/render_web_stills.mjs (light and dark). They come alive while hovered (or, on
+//   phones, while centred on screen) and go back to a picture after. Without a ready-made picture, one is drawn.
+// - The home-page board shows its ready-made picture at once and starts the live model on the first scroll,
+//   pointer move, touch or key press, or once the page has been idle a moment.
 // - Any viewer that scrolls well out of sight turns back into a picture and frees its WebGL context, and no more
 //   than LIVE_MAX of them (besides the hero) run at once.
 // - A context the browser drops is rebuilt; a model that fails to download is retried, then a picture is shown.
@@ -38,7 +41,7 @@
   // Pictures of models already drawn, so a model is only ever rendered once per size and theme.
   const snaps = new Map();
   const snapKey = (el) => `${el.dataset.stl}|${dark() ? 'd' : 'l'}|${Math.round(el.clientWidth / 40)}x${Math.round(el.clientHeight / 40)}`;
-  function showPicture(el, url) {
+  function showPicture(el, url, onError) {
     let img = el.querySelector(':scope > img.snap');
     if (!img) {
       img = document.createElement('img');
@@ -47,9 +50,12 @@
       img.decoding = 'async';
       el.prepend(img);
     }
+    img.onerror = onError || null;
     img.src = url;
     img.style.visibility = '';
   }
+  // The ready-made picture for this view, in the page's current theme.
+  const madePicture = (el) => el.dataset[dark() ? 'stillDark' : 'stillLight'];
 
   const live = new Set();   // running viewers other than the hero, oldest first
 
@@ -488,6 +494,7 @@
         controls.update();
       }
       renderer.render(scene, camera);
+      if (el._capture && state.ready) { el._capture(renderer.domElement.toDataURL('image/webp', 0.9)); el._capture = null; }
       if (first && state.ready) {
         first = false;
         renderer.domElement.style.opacity = '';   // the live model now covers the picture
@@ -512,9 +519,12 @@
           host.addEventListener('pointerleave', () => setActive(el, false));
         }
         if (still) {
-          const cached = snaps.get(snapKey(el));
-          if (cached) showPicture(el, cached);
-          else if (!el._v) start(el);   // draw it once to get its picture
+          const cached = snaps.get(snapKey(el)), made = madePicture(el);
+          if (made && !el._pictured) {
+            el._pictured = true;
+            showPicture(el, made, () => { if (!el._v) start(el); });   // missing file: draw one instead
+          } else if (cached) showPicture(el, cached);
+          else if (!el._v && !made) start(el);   // draw it once to get its picture
         } else if (!el._v) start(el);
       } else if (el._v?.release && !el._hero) el._v.release();
     }
@@ -535,15 +545,29 @@
     // The home-page board. options: { progress, labels, leaders, traces }, see mount().
     hero(el, src, options) {
       el._hero = options;
-      this.watch(el, src, 'layers', { poster: options.poster });
+      this.watch(el, src, 'layers', { poster: options.poster, stills: options.stills });
     },
     watch(el, src, type, options = {}) {
       el.dataset.stl = src;
       el.dataset.type = type || 'stl';
       if (options.poster) el.dataset.poster = options.poster;
-      if (el._hero) {   // the hero never turns into a picture
-        new IntersectionObserver((e, o) => { if (e[0].isIntersecting) { o.disconnect(); start(el); } },
-          { rootMargin: '200px' }).observe(el);
+      for (const [k, v] of Object.entries(options.stills || {})) el.dataset['still' + k[0].toUpperCase() + k.slice(1)] = v;
+      if (el._hero) {   // the hero never turns back into a picture once it is live
+        const made = el.dataset[innerWidth < 700 ? 'stillNarrow' : 'stillWide'];
+        if (made) showPicture(el, made);
+        let go = () => {
+          go = () => {};
+          for (const [type, fn] of wake) removeEventListener(type, fn);
+          new IntersectionObserver((e, o) => { if (e[0].isIntersecting) { o.disconnect(); if (el.isConnected) start(el); } },
+            { rootMargin: '200px' }).observe(el);
+        };
+        // A real scroll only: the page itself jumps to the top when a view is drawn.
+        const wake = ['scroll', 'pointermove', 'pointerdown', 'touchstart', 'keydown', 'wheel']
+          .map((type) => [type, () => { if (type !== 'scroll' || scrollY > 40) go(); }]);
+        for (const [type, fn] of wake) addEventListener(type, fn, { passive: true });
+        const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 1));
+        addEventListener('load', () => setTimeout(() => idle(() => go(), { timeout: 2000 }), 2500), { once: true });
+        if (document.readyState === 'complete') setTimeout(() => idle(() => go(), { timeout: 2000 }), 2500);
         return;
       }
       near.observe(el);
