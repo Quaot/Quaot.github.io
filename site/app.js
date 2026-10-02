@@ -28,13 +28,29 @@
   // *words* in the data become italic serif emphasis.
   const rich = (t) => (t || '').split(/(\*[^*]+\*)/).map((s) => (s.startsWith('*') ? h('em', {}, s.slice(1, -1)) : s));
 
+  // Colour contrast as WCAG measures it, so text on and in project colours stays readable.
+  const rgb = (hex) => { const n = parseInt(hex.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
+  const lum = (c) => {
+    const [r, g, b] = c.map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const contrast = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+  const INK = '#17150f', PAPER = '#f6f0e4';
   // Ink or paper, whichever reads better on a project's colour.
-  function onColor(hex) {
-    const n = parseInt((hex || '#000').slice(1), 16);
-    const lum = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
-    return lum > 0.6 ? '#17150f' : '#f6f0e4';
+  const onColor = (hex) => (contrast(rgb(hex), rgb(INK)) >= contrast(rgb(hex), rgb(PAPER)) ? INK : PAPER);
+  // The project's colour as text on a page background: moved toward the text colour just until it reads (4.5:1).
+  function textTone(hex, bg, fg) {
+    const c = rgb(hex), b = rgb(bg), f = rgb(fg);
+    for (let t = 0; t <= 1; t += 0.05) {
+      const mix = c.map((v, i) => Math.round(v + (f[i] - v) * t));
+      if (contrast(mix, b) >= 4.5) return `rgb(${mix.join(',')})`;
+    }
+    return fg;
   }
-  const paint = (p) => `--c:${p.color || '#17150f'};--on:${onColor(p.color)}`;
+  const paint = (p) => {
+    const c = p.color || INK;
+    return `--c:${c};--on:${onColor(c)};--ct-l:${textTone(c, '#f1ebdf', INK)};--ct-d:${textTone(c, '#13110d', '#f1ebdf')}`;
+  };
   const num = (k) => String(k + 1).padStart(2, '0');
 
   const is3D = (m) => m.type === 'stl' || m.type === 'glb';
@@ -250,10 +266,10 @@
     const pr = d.profile || {};
     const all = projects(d);
     const byId = (id) => all.find((x) => x.id === id);
-    const tint = (id) => (byId(id) ? paint(byId(id)) : '--c:var(--accent);--on:#f6f0e4');
+    const tint = (id) => paint(byId(id) || { color: '#e4572e' });
     const mail = (d.links || []).find((l) => l.url.startsWith('mailto:'));
     const h2 = (lead, rest) => h('h2', { class: 'pf-h2' }, h('em', {}, lead), rest);
-    return h('div', { class: 'page profile', style: '--c:#e4572e;--on:#f6f0e4' },
+    return h('div', { class: 'page profile', style: paint({ color: '#e4572e' }) },
       h('header', { class: 'pf-head' },
         h('h1', {}, 'A bit more ', h('em', {}, 'about me'), '.'),
         pr.lead ? h('p', { class: 'pf-lead' }, rich(pr.lead)) : null),
