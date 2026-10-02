@@ -19,6 +19,20 @@
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     el.appendChild(renderer.domElement);
+    // Browsers drop WebGL contexts under GPU pressure, after a tab sits in the background, or when a page comes
+    // back from the back/forward cache. A dropped context leaves a blank canvas, so start this viewer again.
+    let alive = true;
+    renderer.domElement.addEventListener('webglcontextlost', (e) => {
+      e.preventDefault();
+      if (!alive) return;
+      alive = false;
+      setTimeout(() => {
+        if (!el.isConnected) return;
+        el.replaceChildren();
+        el._viewer = false;
+        mount(el, src, type);
+      }, 250);
+    });
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 5000);
@@ -237,8 +251,14 @@
       controls.maxDistance = r * 8;
       controls.update();
     }
-    const failed = () => { loading.textContent = 'Model failed to load'; };
+    // A model that fails to download is tried twice more before saying so.
+    let tries = 0;
+    const failed = () => {
+      if (tries++ < 2 && el.isConnected && alive) setTimeout(load, 900 * tries);
+      else loading.textContent = 'Model failed to load';
+    };
 
+    function load() {
     if (type === 'glb' || type === 'layers') {
       // Textured model (e.g. a PCB), already Y-up and centred. Keep its own colours.
       renderer.outputEncoding = THREE.sRGBEncoding;
@@ -294,6 +314,8 @@
         frame(geometry.boundingSphere.radius);
       }, undefined, failed);
     }
+    }
+    load();
 
     // Draw at the screen's own density (3x on most phones) so the model is as sharp as the pictures
     // around it, but keep each canvas under about 6 million pixels so large viewers stay smooth.
@@ -312,7 +334,9 @@
     let visible = true;
     new IntersectionObserver((e) => { visible = e[0].isIntersecting; }).observe(el);
     (function loop() {
+      if (!alive) return;      // the context was lost: a fresh viewer has taken over
       if (!el.isConnected) {   // its page was replaced: free the GL context
+        alive = false;
         controls.dispose();
         renderer.dispose();
         renderer.forceContextLoss();

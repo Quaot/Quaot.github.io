@@ -339,6 +339,8 @@
     $$('[data-links]').forEach((el) => el.replaceChildren(...linkList((d.links || []).filter((l) => !mail.includes(l)))));
     $$('[data-email]').forEach((el) => el.replaceChildren(...mail.map((l) => h('a', { href: l.url }, l.url.slice(7)))));
     window.addEventListener('hashchange', render);
+    // Coming back with the Back button can restore this page from cache with its 3D canvases dead: redraw it.
+    window.addEventListener('pageshow', (e) => { if (e.persisted) render(); });
     render();
   }).catch(() => {
     $('[data-view]').textContent = 'Could not load data.json. Run python scripts/build.py first.';
