@@ -1,3 +1,6 @@
+> **Moved.** This site now lives at **[justin.brogu.ca](https://justin.brogu.ca)**. This repo only publishes
+> redirects from the old quaot.github.io addresses (see `redirect/` and `.github/workflows/pages.yml`).
+
 # Portfolio
 
 My portfolio site, [quaot.github.io](https://quaot.github.io). All the content lives in small YAML files, and a
